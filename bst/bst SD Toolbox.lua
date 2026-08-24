@@ -5,18 +5,13 @@
 
 local r = reaper
 
+
+
+
 if not r.ImGui_GetBuiltinPath then
-  r.MB('本脚本需要 ReaImGui 扩展才能运行。
-
-安装方法:
-1. 菜单 Extensions → ReaPack → Browse packages
-2. 搜索 "reaimgui" (作者 cfillion), 点 Install
-3. 重启 REAPER 后再次运行本脚本
-
-若尚未安装 ReaPack, 请先到 https://www.reapack.com 下载', 'bst Sound Design Toolbox', 0)
+  r.MB('本脚本需要 ReaImGui 扩展 (v0.10+)：\n1. 菜单 Extensions → ReaPack → Browse packages\n2. 搜索 "reaimgui"（作者 cfillion）→ Install\n3. 重启 REAPER 后再运行本脚本。', 'bst Sound Design Toolbox', 0)
   return
 end
-
 package.path = r.ImGui_GetBuiltinPath() .. '/?.lua'
 local ImGui = require 'imgui' '0.10'   -- top level, never inside pcall
 

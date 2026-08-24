@@ -174,21 +174,14 @@ if CBM_CMD then
 end
 -- ============================ ReaImGui + Fluent 加载 ============================
 
--- 环境检查: 缺 ReaImGui 时给出可操作的安装指引而非裸报错
+local imgui
+
+
+
 if not r.ImGui_GetBuiltinPath then
-  r.MB('本脚本需要 ReaImGui 扩展才能运行。
-
-安装方法:
-1. 菜单 Extensions → ReaPack → Browse packages
-2. 搜索 "reaimgui" (作者 cfillion), 点 Install
-3. 重启 REAPER 后再次运行本脚本
-
-若尚未安装 ReaPack, 请先到 https://www.reapack.com 下载', 'bst Clipboard Manager', 0)
+  r.MB('本脚本需要 ReaImGui 扩展 (v0.10+)：\n1. 菜单 Extensions → ReaPack → Browse packages\n2. 搜索 "reaimgui"（作者 cfillion）→ Install\n3. 重启 REAPER 后再运行本脚本。', 'bst Clipboard Manager', 0)
   return
 end
-
-local imgui
-package.path = r.ImGui_GetBuiltinPath()local imgui
 package.path = r.ImGui_GetBuiltinPath() .. '/?.lua'
 imgui = require 'imgui' '0.10'   -- 必须顶层直接执行(不可 pcall 包裹), 否则 shim 初始化上下文错误
 if type(imgui) ~= 'table' then

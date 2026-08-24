@@ -1,7 +1,15 @@
 # bst ReaScripts
 
-游戏音频 / 音效设计向的 REAPER 脚本套件(前缀 `bst`),Fluent UI风格,支持通过
+游戏音频 / 音效设计向的 REAPER 脚本套件(前缀 `bst`),Fluent UI 风格,支持通过
 **ReaPack** 一键安装与更新。
+
+## 面板预览
+
+![Sound Design Toolbox](img/sd_toolbox.png)
+
+![Search Palette](img/search_palette.png)
+
+![Clipboard Manager](img/clipboard_manager.png)
 
 两组脚本:
 
@@ -16,29 +24,41 @@
 2. 点 `Add`,填入本仓库索引地址:
 
    ```
-   https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/index.xml
+   https://github.com/bpmstall/bst-reascripts/raw/main/index.xml
    ```
+   (国内网络若拉不到 raw.githubusercontent.com,可用上面的 github.com/raw 形式,二者等价)
 
 3. `Extensions > ReaPack > Browse packages`,按分类整组安装
    (BST Sound Tools 内的 `bst_lib` / `bst_fluent` 是必需依赖)。
-4. 安装后动作列表搜 `bst:` 即可;建议手动把 **bst: 智能复制** 绑到 Ctrl+C。
+4. 安装后动作列表搜 `bst:` 即可。
 
-> 把上面 URL 与 index.xml 里的 `bpmstall` 替换成实际 GitHub 用户名。
-> 一键替换:`sed -i 's/bpmstall/<你的用户名>/g' index.xml`
+## 必做:把「智能复制」绑到 Ctrl+C
+
+剪贴板历史是靠智能捕获填充的——为此需要让 **bst: Copy (Smart)** 成为一个
+常用快捷键动作:
+
+1. 打开 Actions(Local or Global):`Actions > Show action list…`
+2. 搜索 `bst Copy (Smart)`(即「智能复制:按上下文复制 item/轨道/时间线并自动入历史」)
+3. 选中后在 **Shortcut for selected action** 里按 `Ctrl+C` 绑定。
+4. 之后在 arrange 里 `Ctrl+C` 即会复制并自动把内容送进剪贴板管理器历史,
+   再在主面板里预览/切片/拖出粘贴。
+
+> 原版 OxTools 用户升级过来时,`Ctrl+C` 绑定会随 RS 动作 ID 原样保留,无需重绑。
+
+## 环境要求
+
+- REAPER 7+、[ReaImGui](https://reapack.com) 扩展(0.10+)
+- 首次运行若缺 ReaImGui,脚本会弹出中文安装指引
+- SWS 可选(拖出落点跟随鼠标时需要)
+- 设置存于 ExtState 段 `OxTools`(工具)与 `CBM` / `CBM_UI`(剪贴板),从旧版 OxTools 升级无需重配
 
 ## 本地开发
 
 - 真源码目录:`%APPDATA%\REAPER\Scripts\bst`(工具)与 `%APPDATA%\REAPER\Scripts\CBM`(剪贴板)
 - 本仓库内容与其保持一致;改动后重新拷贝并提交即可
-- 回归测试:`oxtools_testing/run_tests.sh`(126 断言)+ `run_cbm_tests.sh`(32 断言)
 
 ## 发布新版本
 
 1. 改完脚本后,在 `index.xml` 对应 `<reapack>` 里追加一个更高版本号的
    `<version>` 块(URL 不变),ReaPack 会自动提示用户升级
 2. `git add -A && git commit -m "..." && git push`
-
-## 兼容性说明
-
-- 需要 REAPER 7+、[ReaImGui](https://reapack.com) 扩展;SWS 可选(拖出落点跟随鼠标需要)
-- 设置存于 ExtState 段 `OxTools`(工具)与 `CBM` / `CBM_UI`(剪贴板),从旧版 OxTools 升级无需重配
