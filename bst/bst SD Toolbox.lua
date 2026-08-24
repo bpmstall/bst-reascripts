@@ -6,8 +6,14 @@
 local r = reaper
 
 if not r.ImGui_GetBuiltinPath then
-  r.MB("ReaImGui extension is required.\nInstall it via ReaPack:\nExtensions > ReaPack > Browse packages > 'reaimgui'",
-       "bst SD Toolbox", 0)
+  r.MB('本脚本需要 ReaImGui 扩展才能运行。
+
+安装方法:
+1. 菜单 Extensions → ReaPack → Browse packages
+2. 搜索 "reaimgui" (作者 cfillion), 点 Install
+3. 重启 REAPER 后再次运行本脚本
+
+若尚未安装 ReaPack, 请先到 https://www.reapack.com 下载', 'bst Sound Design Toolbox', 0)
   return
 end
 
