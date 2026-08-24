@@ -1,116 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" src="https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/index.xml">
+<index version="1" src="https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/index.xml">
   <category name="BST Sound Tools">
     <reapack type="script" name="bst Normalize items.lua" desc="条目峰值归一化到目标 dBFS">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Normalize items.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Normalize%20items.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Normalize items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Normalize%20items.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Rename takes.lua" desc="批量重命名 take (合法文件名字符保护)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Rename takes.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Rename%20takes.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Rename takes.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Rename%20takes.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Render Blocks.lua" desc="渲染块管理 (LKC RenderBlocks 核心流程复刻)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Render Blocks.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Render%20Blocks.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Render Blocks.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Render%20Blocks.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Render selected items.lua" desc="选中条目静默批量渲染为 WAV">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Render selected items.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Render%20selected%20items.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Render selected items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Render%20selected%20items.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst SD Toolbox.lua" desc="声音设计工具箱: 变奏/淡变/归一化/重命名/渲染 一体化 Fluent 面板">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst SD Toolbox.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20SD%20Toolbox.lua</source>
+        <source main="main" type="text/plain" file="bst/bst SD Toolbox.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20SD%20Toolbox.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Search Palette.lua" desc="命令面板: 轨道/素材/标记/FX/脚本 模糊搜索直达">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Search Palette.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Search%20Palette.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Search Palette.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Search%20Palette.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Variation generator.lua" desc="快速生成素材变体">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Variation generator.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Variation%20generator.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Variation generator.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variation%20generator.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Variations Studio.lua" desc="素材变奏工作台 (nvk VARIATIONS 式)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Variations Studio.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Variations%20Studio.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Variations Studio.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variations%20Studio.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Zero-Cross Trim &amp; Loop.lua" desc="零交叉裁剪与循环制作">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst Zero-Cross Trim &amp; Loop.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst%20Zero-Cross%20Trim%20%26%20Loop.lua</source>
+        <source main="main" type="text/plain" file="bst/bst Zero-Cross Trim &amp; Loop.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Zero-Cross%20Trim%20%26%20Loop.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst_fluent.lua" desc="Fluent 2 设计系统库 (被其他 bst 脚本加载, 请整组安装)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst_fluent.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst_fluent.lua</source>
+        <source main="main" type="text/plain" file="bst/bst_fluent.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst_fluent.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst_lib.lua" desc="共享引擎库 (被其他 bst 脚本加载, 请整组安装)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="bst/bst_lib.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/bst/bst_lib.lua</source>
+        <source main="main" type="text/plain" file="bst/bst_lib.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst_lib.lua</source>
       </version>
     </reapack>
   </category>
   <category name="BST Clipboard">
     <reapack type="script" name="bst Capture Envelope.lua" desc="捕获选中包络到剪贴板历史">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Capture Envelope.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Capture%20Envelope.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Capture Envelope.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Envelope.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Capture Items.lua" desc="捕获选中 media items 到剪贴板历史">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Capture Items.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Capture%20Items.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Capture Items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Items.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Capture MIDI.lua" desc="捕获 take MIDI 到剪贴板历史">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Capture MIDI.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Capture%20MIDI.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Capture MIDI.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20MIDI.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Capture Markers.lua" desc="捕获全部标记/区域到剪贴板历史">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Capture Markers.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Capture%20Markers.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Capture Markers.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Markers.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Capture Tracks.lua" desc="捕获选中轨道到剪贴板历史">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Capture Tracks.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Capture%20Tracks.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Capture Tracks.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Tracks.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Clipboard Manager.lua" desc="剪贴板管理器主面板: 捕获 item/轨道/标记/包络/MIDI, 波形预览选区, 切片拖出粘贴">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Clipboard Manager.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Clipboard Manager.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Clipboard%20Manager.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Copy (Smart).lua" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Copy (Smart).lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Copy%20%28Smart%29.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Copy (Smart).lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Copy%20%28Smart%29.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Copy Items.lua" desc="复制选中 items (原生复制 + 自动入历史)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Copy Items.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Copy%20Items.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Copy Items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Copy%20Items.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Paste Last.lua" desc="把最近一条历史粘贴到编辑光标">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Paste Last.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Paste%20Last.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Paste Last.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Paste%20Last.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Settings.lua" desc="剪贴板管理器设置面板">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Settings.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Settings.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Settings.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Settings.lua</source>
       </version>
     </reapack>
     <reapack type="script" name="bst Toggle Sidebar.lua" desc="显示/隐藏剪贴板管理器侧边栏">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
-        <source main="main" type="text/plain" file="CBM/bst Toggle Sidebar.lua">https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/CBM/bst%20Toggle%20Sidebar.lua</source>
+        <source main="main" type="text/plain" file="CBM/bst Toggle Sidebar.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Toggle%20Sidebar.lua</source>
       </version>
     </reapack>
   </category>

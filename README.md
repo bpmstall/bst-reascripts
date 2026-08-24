@@ -16,15 +16,15 @@
 2. 点 `Add`,填入本仓库索引地址:
 
    ```
-   https://raw.githubusercontent.com/YOUR_USERNAME/bst-reascripts/main/index.xml
+   https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/index.xml
    ```
 
 3. `Extensions > ReaPack > Browse packages`,按分类整组安装
    (BST Sound Tools 内的 `bst_lib` / `bst_fluent` 是必需依赖)。
 4. 安装后动作列表搜 `bst:` 即可;建议手动把 **bst: 智能复制** 绑到 Ctrl+C。
 
-> 把上面 URL 与 index.xml 里的 `YOUR_USERNAME` 替换成实际 GitHub 用户名。
-> 一键替换:`sed -i 's/YOUR_USERNAME/<你的用户名>/g' index.xml`
+> 把上面 URL 与 index.xml 里的 `bpmstall` 替换成实际 GitHub 用户名。
+> 一键替换:`sed -i 's/bpmstall/<你的用户名>/g' index.xml`
 
 ## 本地开发
 
