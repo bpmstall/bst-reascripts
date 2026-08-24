@@ -1,6 +1,6 @@
 # bst ReaScripts
 
-游戏音频 / 音效设计向的 REAPER 脚本套件(前缀 `bst`),Fluent 2 风格 UI,支持通过
+游戏音频 / 音效设计向的 REAPER 脚本套件(前缀 `bst`),Fluent UI风格,支持通过
 **ReaPack** 一键安装与更新。
 
 两组脚本:
