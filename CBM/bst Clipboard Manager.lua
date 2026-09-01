@@ -2377,76 +2377,42 @@ local function frame()
       S.toast = nil
     end
 
-    -- ===== 行 A: 面板栏 (剪贴板面板切换 / 类型收纳 / 设置) =====
+    -- ===== 行 A: 面板栏 (配置文件式切换) + 类型 + 设置 =====
+    imgui.PushStyleVar(ctx, imgui.StyleVar_FramePadding, 7, 2.5)
+    imgui.PushStyleVar(ctx, imgui.StyleVar_ItemSpacing, 5, 3)
     do
       local ab = get_board(S.active_board) or S.boards[1]
       local abname = ab and ab.name or '?'
       if S.active_board:sub(1, 5) == 'proj:' then abname = '📁 ' .. project_name() end
-      local btxt = ('%s (%d)'):format(abname, #S.entries)
-      local btw = math.min(math.max(select(1, imgui.CalcTextSize(ctx, btxt)) + 24, 90), w - 170)
-      if fl.button(ctx, btxt, { width = btw }) then
-        imgui.OpenPopup(ctx, 'boards')
+      imgui.SetNextItemWidth(ctx, math.min(w * 0.36, 168))
+      if imgui.BeginCombo(ctx, '##boardsel', abname .. ' (' .. #S.entries .. ')') then
+        for _, b in ipairs(S.boards) do
+          if imgui.Selectable(ctx, b.name .. '  (' .. #b.entries .. ')##bs_' .. b.id,
+                              b.id == S.active_board) then
+            switch_board(b.id)
+          end
+        end
+        imgui.Separator(ctx)
+        if imgui.Selectable(ctx, '📁 本项目 (按工程独立)##bs_proj') then
+          local want = 'proj:' .. project_key()
+          ensure_board(want, '📁 ' .. project_name())
+          switch_board(want)
+        end
+        if imgui.Selectable(ctx, '＋ 新建面板…##bs_new') then
+          S.renaming = 'new' S.renaming_name = ''
+        end
+        imgui.EndCombo(ctx)
       end
       if imgui.IsItemHovered(ctx) then
-        imgui.SetTooltip(ctx, '剪贴板面板: 复制/捕获进入当前面板\n通用 | 📁 本项目(按工程独立) | 自定义面板')
+        imgui.SetTooltip(ctx, '剪贴板面板 = 按用途区分的独立历史\n复制/捕获进入当前面板')
       end
       imgui.SameLine(ctx)
-      local kind_lbl = '全部'
-      for _, kc in ipairs(KIND_CHIPS) do if kc.id == S.kind_filter then kind_lbl = kc.label end end
-      if fl.button(ctx, '类型: ' .. kind_lbl, { subtle = true, width = 96 }) then
-        imgui.OpenPopup(ctx, 'kinds')
-      end
-      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '按类型筛选 (收纳在下拉里)') end
-      imgui.SameLine(ctx)
-      if fl.button(ctx, '设置', { subtle = true, width = 52 }) then
-        S.ff_test_msg = nil
-        imgui.OpenPopup(ctx, 'settings')
-      end
-      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '打开设置') end
-    end
-    -- 面板切换弹窗
-    if imgui.BeginPopup(ctx, 'boards') then
-      for _, b in ipairs(S.boards) do
-        local nm = b.name
-        if b.id:sub(1, 5) == 'proj:' then nm = '📁 ' .. (basename(project_key()) ~= 'unsaved' and basename(project_key()) or b.name) end
-        if imgui.Selectable(ctx, ('%s  (%d)##b_%d'):format(nm, #b.entries, b.id), b.id == S.active_board) then
-          switch_board(b.id)
-        end
-      end
-      imgui.Dummy(ctx, 0, 2)
-      imgui.Separator(ctx)
-      imgui.Dummy(ctx, 0, 2)
-      if imgui.Selectable(ctx, '📁 本项目 (按工程独立)##proj') then
-        local want = 'proj:' .. project_key()
-        ensure_board(want, '📁 ' .. project_name())
-        switch_board(want)
-      end
-      imgui.Dummy(ctx, 0, 2)
-      if fl.button(ctx, '管理面板…', { subtle = true, width = -1 }) then
-        imgui.CloseCurrentPopup(ctx)
-        imgui.OpenPopup(ctx, 'boards_mgmt')
-      end
-      imgui.EndPopup(ctx)
-    end
-    -- 面板管理弹窗
-    if imgui.BeginPopup(ctx, 'boards_mgmt') then
-      fl.subtitle(ctx, '面板管理')
-      fl.caption(ctx, '各面板历史独立; 复制/捕获进入当前面板')
-      imgui.Dummy(ctx, 0, 3)
-      for bi, b in ipairs(S.boards) do
-        if imgui.Selectable(ctx, ((b.id == S.active_board) and '● ' or '○ ') .. b.name
-          .. '  (' .. #b.entries .. ')##mg' .. bi, b.id == S.active_board) then
-          switch_board(b.id)
-        end
-      end
-      imgui.Dummy(ctx, 0, 3)
-      imgui.Separator(ctx)
-      imgui.Dummy(ctx, 0, 3)
       if S.renaming then
-        local ch_n, nv = imgui.InputTextWithHint(ctx, '##boardname', '输入面板名…', S.renaming_name or '')
+        imgui.SetNextItemWidth(ctx, 110)
+        local ch_n, nv = imgui.InputTextWithHint(ctx, '##boardname', '面板名…', S.renaming_name or '')
         if ch_n then S.renaming_name = nv end
         imgui.SameLine(ctx)
-        if fl.button(ctx, '确定', { accent = true, width = 52 }) then
+        if fl.button(ctx, '✓', { accent = true }) then
           local nm = tostring(S.renaming_name or ''):gsub('^%s+', ''):gsub('%s+$', '')
           if nm ~= '' then
             if S.renaming == 'new' then
@@ -2460,37 +2426,36 @@ local function frame()
           end
           S.renaming = nil
         end
-      else
-        if fl.button(ctx, '新建面板', { width = 96 }) then
-          S.renaming = 'new' S.renaming_name = ''
-        end
         imgui.SameLine(ctx)
-        if fl.button(ctx, '重命名当前', { subtle = true, width = 100 }) then
-          local b = get_board(S.active_board)
-          S.renaming = 'rename' S.renaming_name = b and b.name or ''
+        if fl.button(ctx, '✕', { subtle = true }) then S.renaming = nil end
+      else
+        local kind_lbl = '全部'
+        for _, kc in ipairs(KIND_CHIPS) do if kc.id == S.kind_filter then kind_lbl = kc.label end end
+        if imgui.BeginCombo(ctx, '##kindsel', kind_lbl) then
+          for _, kc in ipairs(KIND_CHIPS) do
+            local n = 0
+            for _, e in ipairs(S.entries) do if match_kind(e, kc.id) then n = n + 1 end end
+            if imgui.Selectable(ctx, kc.label .. '  (' .. n .. ')##k_' .. kc.id,
+                                S.kind_filter == kc.id) then
+              S.kind_filter = kc.id
+            end
+          end
+          imgui.EndCombo(ctx)
         end
-      end
-      imgui.Dummy(ctx, 0, 3)
-      if fl.button(ctx, '清空当前面板', { danger = true, width = -1 }) then
-        local ok_x, msg_x = exec_cmd('clear')
-        set_toast(ok_x and 'ok' or 'bad', msg_x or '')
-      end
-      imgui.EndPopup(ctx)
-    end
-    -- 类型筛选弹窗
-    if imgui.BeginPopup(ctx, 'kinds') then
-      for _, kc in ipairs(KIND_CHIPS) do
-        local n = 0
-        for _, e in ipairs(S.entries) do if match_kind(e, kc.id) then n = n + 1 end end
-        if imgui.Selectable(ctx, ('%s  (%d)##k_%s'):format(kc.label, n, kc.id),
-                            S.kind_filter == kc.id) then
-          S.kind_filter = kc.id
+        if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '类型筛选') end
+        imgui.SameLine(ctx)
+        if fl.button(ctx, '设置', { subtle = true }) then
+          S.ff_test_msg = nil
+          imgui.OpenPopup(ctx, 'settings')
         end
+        if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '打开设置 (含面板管理)') end
       end
-      imgui.EndPopup(ctx)
     end
+    imgui.PopStyleVar(ctx, 2)
 
     -- ===== 行 B: 搜索 (通配符/记忆) + 捕获 + 清空 =====
+    imgui.PushStyleVar(ctx, imgui.StyleVar_FramePadding, 7, 2.5)
+    imgui.PushStyleVar(ctx, imgui.StyleVar_ItemSpacing, 5, 3)
     do
       local cap_w, clr_w = 58, compact and 44 or 52
       local hist_w, wild_w = 26, 28
@@ -2544,6 +2509,8 @@ local function frame()
       end
       if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '清空当前面板全部条目 (需二次确认)') end
     end
+    imgui.PopStyleVar(ctx, 2)
+
     -- 搜索记忆弹窗
     if imgui.BeginPopup(ctx, 'search_hist') then
       if #S.search_hist == 0 then
@@ -2596,6 +2563,48 @@ local function frame()
         end
       end
       fl.caption(ctx, '拖出卡片: 松开=插入 · Ctrl+松开=渲染导出到 <工程>/bst_clips/')
+      imgui.Dummy(ctx, 0, 2)
+      imgui.Separator(ctx)
+      imgui.Dummy(ctx, 0, 2)
+      fl.body(ctx, '面板管理')
+      do
+        local ab = get_board(S.active_board) or S.boards[1]
+        if fl.button(ctx, '重命名当前面板', { subtle = true }) then
+          S.renaming = 'rename' S.renaming_name = ab and ab.name or ''
+        end
+        imgui.SameLine(ctx)
+        local confirming = os.clock() < (S.del_board_until or 0)
+        if fl.button(ctx, confirming and '确认删除?' or '删除当前面板',
+                     confirming and { danger = true } or { subtle = true }) then
+          if confirming and ab then
+            if #S.boards <= 1 then
+              set_toast('warn', '至少保留一个面板', 2)
+            elseif ab.id == 'global' then
+              set_toast('warn', '通用面板不可删除 (可清空)', 2)
+            else
+              for i, bb in ipairs(S.boards) do
+                if bb.id == ab.id then table.remove(S.boards, i) break end
+              end
+              for _, e in ipairs(ab.entries) do
+                if S.pv[e.id] and S.pv[e.id].src then pc(r.PCM_Source_Destroy, S.pv[e.id].src) end
+              end
+              S.pv = {}
+              S.active_board = 'global'
+              S.entries = get_board('global').entries
+              S.dirty = true
+              set_toast('ok', '已删除面板「' .. ab.name .. '」', 2)
+            end
+            S.del_board_until = 0
+          else
+            S.del_board_until = os.clock() + 3
+          end
+        end
+        imgui.SameLine(ctx)
+        if fl.button(ctx, '清空当前面板', { subtle = true }) then
+          local ok_x, msg_x = exec_cmd('clear')
+          set_toast(ok_x and 'ok' or 'bad', msg_x or '')
+        end
+      end
       imgui.Dummy(ctx, 0, 2)
 
       imgui.Dummy(ctx, 0, 4)
