@@ -260,7 +260,12 @@ function M.toggle(ctx, label, value)
     ImGui.SameLine(ctx)
   end
   local w, h = 40, 20
-  local clicked = ImGui.InvisibleButton(ctx, "##fl_tgl", w, h)
+  -- id 必须每个开关唯一: 同窗口同 id 的 InvisibleButton 是同一个控件
+  -- (点击会命中第一个开关)。用标签派生 id, 无标签用自增计数兜底。
+  M._tgl_n = (M._tgl_n or 0) + 1
+  local bid = (label and label ~= "") and (label .. "##fl_tgl_" .. label)
+              or ("##fl_tgl_" .. M._tgl_n)
+  local clicked = ImGui.InvisibleButton(ctx, bid, w, h)
   local hovered = ImGui.IsItemHovered(ctx)
   local active = ImGui.IsItemActive(ctx)
   local x1, y1 = ImGui.GetItemRectMin(ctx)

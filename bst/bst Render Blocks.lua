@@ -137,7 +137,7 @@ local function pack(items, name)
   local label = r.AddMediaItemToTrack(lib.item_track(items[1]))
   r.SetMediaItemInfo_Value(label, "D_POSITION", pmin)
   r.SetMediaItemInfo_Value(label, "D_LENGTH", pmax - pmin)
-  r.SetMediaItemInfo_Value(label, "B_UISEL", false)
+  r.SetMediaItemInfo_Value(label, "B_UISEL", 0)
   r.SetMediaItemInfo_Value(label, "I_CUSTOMCOLOR", BLOCK_COLOR)
   r.GetSetMediaItemInfo_String(label, "P_NOTES", name or ("block_" .. os.date("%H%M%S")), true)
   for _, it in ipairs(items) do

@@ -51,6 +51,10 @@
         <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
         <changelog>对标 LKC RenderBlocks: 渲染状态寄存 (标签 notes 写入 RBST 行) + 已渲染可视标记 (变绿) + 跳过已渲染 + 相对 tail (块长百分比) + 清除全部渲染标记</changelog>
       </version>
+      <version name="1.3" author="bpmstall" time="2026-09-01T22:40:00Z">
+        <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
+        <changelog>修复 Pack 崩溃: B_UISEL 传布尔被新版 REAPER 绑定拒绝 (number expected, got boolean), 改为数字 0</changelog>
+      </version>
     </reapack>
     <reapack name="bst Render selected items.lua" type="script" desc="选中条目静默批量渲染为 WAV">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
@@ -109,6 +113,10 @@
     <reapack name="bst_fluent.lua" type="script" desc="Fluent 2 设计系统库 (被其他 bst 脚本加载, 请整组安装)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst_fluent.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst_fluent.lua</source>
+      </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T22:40:00Z">
+        <source main="main" file="bst/bst_fluent.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst_fluent.lua</source>
+        <changelog>修复 toggle 开关 ID 冲突 (所有开关共用同一 InvisibleButton id, 同屏多个开关点击错乱) —— id 改为按标签派生</changelog>
       </version>
     </reapack>
     <reapack name="bst_lib.lua" type="script" desc="共享引擎库 (被其他 bst 脚本加载, 请整组安装)">
