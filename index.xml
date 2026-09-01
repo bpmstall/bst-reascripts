@@ -259,6 +259,20 @@
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
         <changelog>Smart Copy (Ctrl+C) 支持复制 FX 链: FX 链窗口聚焦时直接枚举轨道 FX 入板 (不依赖剪贴板文本, 之前被全局 Ctrl+C 拦截导致原生 FX 复制从未执行); 拖出提示改面板 toast (修 tooltip 字体回退显示 ?)</changelog>
       </version>
+      <version name="2.5" author="bpmstall" time="2026-09-02T01:10:00Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>修正 GetFocusedFX 语义 (tracknumber 0 基且 0=master, 之前错传 +1); 支持 item take FX 捕获 (retval=2); capture_fxchain 支持 master 轨</changelog>
+      </version>
+    </reapack>
+    <reapack name="bst Copy (Smart) - MIDI.lua" type="script" desc="Smart Copy · MIDI 编辑器版: 捕获 take MIDI + 转发原生复制 (需在 MIDI 编辑器区把 Ctrl+C 绑到本动作)">
+      <version name="1.0" author="bpmstall" time="2026-09-02T01:10:00Z">
+        <source main="midi_editor" file="CBM/bst Copy (Smart) - MIDI.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Copy%20%28Smart%29%20-%20MIDI.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Copy (Smart) - MediaExplorer.lua" type="script" desc="Smart Copy · Media Explorer 版: 执行复制媒体文件路径, 主面板剪贴板监视自动捕获 (需在 ME 区把 Ctrl+C 绑到本动作)">
+      <version name="1.0" author="bpmstall" time="2026-09-02T01:10:00Z">
+        <source main="mediaexplorer" file="CBM/bst Copy (Smart) - MediaExplorer.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Copy%20%28Smart%29%20-%20MediaExplorer.lua</source>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">

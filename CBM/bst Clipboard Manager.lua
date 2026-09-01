@@ -771,12 +771,56 @@ local function capture_envelope()
   return add_entry(e), e.title
 end
 
--- 捕获轨道 FX 链 (Smart Copy 在 FX 链窗口聚焦时的主路径; 不依赖剪贴板文本)
-local function capture_fxchain(track_id)
-  local tr
-  if track_id and tonumber(track_id) then
-    tr = r.CSurf_TrackFromID(tonumber(track_id), false)
+-- 捕获 FX 链 (Smart Copy 在 FX 链窗口聚焦时的主路径; 不依赖剪贴板文本)
+-- track_id: CSurf 号 (0=master, 1=轨1...); item_id 给定时捕获 item take FX
+local function capture_fxchain(track_id, item_id)
+  local fxn, n, src_desc
+  if item_id and tonumber(item_id) then
+    local it = r.GetMediaItem(0, tonumber(item_id))
+    if not it then return nil, '没有找到 item (FX 链捕获)' end
+    local take = r.GetActiveTake(it)
+    if not take then return nil, '该 item 没有 take' end
+    n = pc(r.TakeFX_GetCount, take) or 0
+    if n == 0 then return nil, '该 take 没有 FX' end
+    for i = 0, n - 1 do
+      local _, nm = pc(r.TakeFX_GetFXName, take, i, '')
+      local _, preset = pc(r.TakeFX_GetPreset, take, i, '')
+      local enabled = pc(r.TakeFX_GetEnabled, take, i)
+      fxn[#fxn+1] = { name = (nm and nm ~= '' and nm) or ('FX' .. i),
+                      preset = preset or '', on = enabled ~= false }
+    end
+    src_desc = 'item take FX'
+  else
+    local tr
+    if track_id and tonumber(track_id) then
+      tr = r.CSurf_TrackFromID(tonumber(track_id), false)
+    end
+    if not (tr and (pc(r.CSurf_TrackToID, tr, false) or -1) >= 0) then
+      tr = r.GetSelectedTrack2(0, 0, false) or r.GetTrack(0, 0)
+    end
+    if not (tr and (pc(r.CSurf_TrackToID, tr, false) or -1) >= 0) then
+      return nil, '没有可用轨道 (FX 链捕获)'
+    end
+    n = pc(r.TrackFX_GetCount, tr) or 0
+    if n == 0 then return nil, '该轨道没有 FX' end
+    for i = 0, n - 1 do
+      local _, nm = pc(r.TrackFX_GetFXName, tr, i, '')
+      local _, preset = pc(r.TrackFX_GetPreset, tr, i, '')
+      local enabled = pc(r.TrackFX_GetEnabled, tr, i)
+      fxn[#fxn+1] = { name = (nm and nm ~= '' and nm) or ('FX' .. i),
+                      preset = preset or '', on = enabled ~= false }
+    end
+    local tid = pc(r.CSurf_TrackToID, tr, false)
+    src_desc = (tid == 0) and 'master' or ('轨道 ' .. tostring(tid))
   end
+  local first = fxn[1].name
+  local e = { kind = 'fxchain', stype = 'LIVE',
+              d = { name = '', color = 0, fx = fxn, sends = 0, recvs = 0, vol = 1, pan = 0 } }
+  e.title = (first .. ((n > 1) and ('  +' .. (n - 1)) or '')):sub(1, 48)
+  return add_entry(e), ('已捕获 FX 链 (%d 个 FX) ← %s'):format(n, src_desc)
+end
+
+local function capture_fxchain_legacy_unused(track_id)
   if not (tr and (pc(r.CSurf_TrackToID, tr, false) or 0) > 0) then
     tr = r.GetSelectedTrack2(0, 0, false) or r.GetTrack(0, 0)
   end
@@ -802,10 +846,15 @@ local function capture_fxchain(track_id)
 end
 
 local function capture_auto()
-  -- FX 链窗口聚焦 → 直接捕获聚焦轨道的 FX 链 (Smart Copy 主路径, 不依赖剪贴板)
-  local fok, ftr = pc(r.GetFocusedFX)
-  if fok and fok % 2 == 1 and ftr and ftr >= 0 then
-    return capture_fxchain(tonumber(ftr + 1))
+  -- FX 链窗口聚焦 → 直接捕获聚焦的 FX 链 (Smart Copy 主路径, 不依赖剪贴板)
+  -- GetFocusedFX: retval 1=轨道 FX 2=item take FX; tracknumber 0=master 1=轨1 (0 基)
+  local fok, ftr, fitm = pc(r.GetFocusedFX)
+  if fok and fok > 0 then
+    if fok == 2 and fitm and fitm >= 0 then
+      return capture_fxchain(nil, fitm)
+    elseif ftr and ftr >= 0 then
+      return capture_fxchain(ftr)
+    end
   end
   if (r.CountSelectedMediaItems(0) or 0) > 0 then return capture_items() end
   if (r.CountSelectedTracks2(0, false) or 0) > 0 then return capture_tracks() end

@@ -14,10 +14,14 @@ local cnt_tracks = reaper.CountSelectedTracks(0)
 local env = reaper.GetSelectedEnvelope(0)
 
 -- 0) FX 链窗口聚焦 → 捕获聚焦轨道的 FX 链 (直接枚举轨道 FX, 不依赖剪贴板文本)
-local fok, ftr = reaper.GetFocusedFX()
-if fok and fok % 2 == 1 and ftr and ftr >= 0 then
+local fok, ftr, fitm = reaper.GetFocusedFX()
+if fok and fok > 0 then
   CBM_CMD = 'capture_fxchain'
-  CBM_ARGS = { track = tostring(ftr + 1) }
+  if fok == 2 and fitm and fitm >= 0 then
+    CBM_ARGS = { item = tostring(fitm) }   -- item take FX
+  else
+    CBM_ARGS = { track = tostring(ftr) }   -- 0=master, 1=轨1 (CSurf 同基)
+  end
   local info = debug.getinfo(1, 'S')
   local src = (info and info.source or ''):gsub('^@', '')
   local dir = src:match('^(.*)[/' .. string.char(92) .. ']') or (reaper.GetResourcePath() .. '/Scripts')
