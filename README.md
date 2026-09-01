@@ -15,8 +15,24 @@
 
 | 分类 | 内容 |
 | --- | --- |
-| BST Sound Tools | 声音设计工具箱、搜索面板、零交叉裁剪循环、变奏工作台、渲染块、批量渲染、归一化、take 重命名等 11 个文件(含共享库 `bst_lib.lua` / `bst_fluent.lua`) |
+| BST Sound Tools | 声音设计工具箱、搜索面板、零交叉裁剪循环、**循环生成器 (Loopmaker)**、**自动多普勒 (Auto Doppler + 配套 JSFX)**、变奏工作台、渲染块、批量渲染、归一化、take 重命名等 13 个文件(含共享库 `bst_lib.lua` / `bst_fluent.lua` 与 `Effects/bst/bst_Doppler.jsfx`) |
 | BST Clipboard | 剪贴板管理器:捕获 item/轨道/标记/包络/MIDI → 波形预览选区切片 → 拖出粘贴,共 11 个文件 |
+
+### 循环生成器 bst: Loopmaker
+
+选中音频 item → 面板里「生成循环」:按零交叉对齐 + 头尾交叉淡化,批量产出
+真正的无缝循环 item(自动开启循环源),支持时选拟定循环长度、每循环随机取
+内容窗做变奏、整秒对齐、前后缀编号命名、空格试听。渲染的 WAV 落在
+`<工程媒体目录>/bst_loops/`。
+
+### 自动多普勒 bst: Auto Doppler
+
+选中轨道(可框选时选限制范围)→「写入自动化」:分析轨道上每个 item 的
+RMS 峰值时刻、把 item 吸附偏移标到峰值,再给配套 JSFX「bst Doppler」的
+路径位置参数写包络,让声源恰好在峰值均值时刻经过听者(声像/距离/音高
+联动)。也可切换「自定义 FX 参数」给任意已装多普勒插件的参数写同类包络。
+JSFX 会随 ReaPack 安装到 `Effects/bst/`;若添加 FX 失败,重启 REAPER
+让其扫描一次即可。
 
 ## 通过 ReaPack 安装
 

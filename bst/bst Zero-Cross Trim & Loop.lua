@@ -23,14 +23,14 @@ local fl = dofile(dir .. "bst_fluent.lua")(ImGui)
 if BST_ZC_LIVE and ImGui.ValidatePtr(BST_ZC_LIVE, 'ImGui_Context*') then
   return -- panel already open
 end
-local ctx = ImGui.CreateContext('Ox Zero-Cross')
+local ctx = ImGui.CreateContext('bst Zero-Cross')
 BST_ZC_LIVE = ctx
 
 local st = {
   window_ms    = lib.ext_getnum("zc_window_ms", 5),
   all_selected = lib.ext_getnum("zc_all", 1),
 }
-local msg, sev = "Select audio items, then trim or loop.", nil
+local msg, sev = "选中音频 item 后裁剪或做循环。", nil
 local err = nil
 
 
@@ -46,7 +46,7 @@ local function set_num(key, v) st[key] = v; lib.ext_set(key, v) end
 local function targets()
   local items = lib.selected_items()
   if #items == 0 then
-    msg, sev = "No items selected.", "warn"
+    msg, sev = "没有选中的 item。", "warn"
     return nil
   end
   if st.all_selected >= 1 then return items end
@@ -70,7 +70,7 @@ local function run(kind)
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: %s (%d item(s))", KIND_LABEL[kind], changed), -1)
-  msg, sev = string.format("%s - %d item(s) adjusted.", KIND_LABEL[kind], changed),
+  msg, sev = string.format("%s —— 已调整 %d 个 item。", KIND_LABEL[kind], changed),
     changed > 0 and "ok" or "warn"
 end
 
@@ -86,7 +86,7 @@ local function draw_body()
 
   ImGui.Dummy(ctx, 0, 4)
   fl.begin_card(ctx, "##card_zc")
-    fl.caption(ctx, "EDITS")
+    fl.caption(ctx, "编辑")
     if fl.button(ctx, "Trim start", { width = 130 }) then run("start") end
     ImGui.SameLine(ctx)
     if fl.button(ctx, "Trim end", { width = 110 }) then run("end") end
@@ -94,7 +94,7 @@ local function draw_body()
     if fl.button(ctx, "Trim both", { accent = true, width = 120 }) then run("both") end
     ImGui.Dummy(ctx, 0, 2)
     if fl.button(ctx, "Make seamless loop", { accent = true, width = 200 }) then run("loop") end
-    fl.caption(ctx, "Loop = zero-cross both edges + enable source looping")
+    fl.caption(ctx, "循环 = 两端零交叉对齐 + 开启 item 循环源")
   fl.end_card(ctx)
 
   local items = lib.selected_items()
@@ -102,13 +102,13 @@ local function draw_body()
     local take = r.GetActiveTake(items[1])
     local name = lib.take_name(take)
     ImGui.Dummy(ctx, 0, 4)
-    fl.caption(ctx, string.format("First selection: %s  |  %.3f s",
-      name ~= "" and name or "(untitled)",
+    fl.caption(ctx, string.format("第一个选中：%s  |  %.3f 秒",
+      name ~= "" and name or "（未命名）",
       r.GetMediaItemInfo_Value(items[1], "D_LENGTH")))
   end
 
   if err then
-    fl.infobar(ctx, "bad", "Error: " .. tostring(err))
+    fl.infobar(ctx, "bad", "错误：" .. tostring(err))
   else
     fl.infobar(ctx, sev, msg)
   end
@@ -125,12 +125,13 @@ local function loop()
   local okf, open = pcall(function()
     ImGui.SetNextWindowSize(ctx, 460, 380, ImGui.Cond_FirstUseEver)
     local nc, nv = fl.push_theme(ctx)
-    local visible, op = ImGui.Begin(ctx, 'Ox Zero-Cross Trim & Loop', true)
+    local visible, op = ImGui.Begin(ctx, 'bst Zero-Cross Trim & Loop', true)
     if visible then
     local ok, e = pcall(draw_body)
-    err = ok and nil or tostring(e)
+    -- 不能写 `ok and nil or tostring(e)`：成功时会得到字符串 "nil"
+    if ok then err = nil else err = tostring(e) end
     if not ok then
-      r.ShowConsoleMsg("Ox Zero-Cross Trim & Loop: " .. tostring(e) .. "\n")
+      r.ShowConsoleMsg("bst Zero-Cross Trim & Loop: " .. tostring(e) .. "\n")
       for _ = 1, 8 do if not pcall(ImGui.EndChild, ctx) then break end end
     end
     ImGui.End(ctx)
@@ -140,7 +141,7 @@ local function loop()
   end)
   if not okf or not open then
     if not okf then -- one-line diagnosis instead of a silent close
-      r.ShowConsoleMsg("Ox Zero-Cross Trim & Loop: frame aborted, closing (" .. tostring(open) .. ")\n")
+      r.ShowConsoleMsg("bst Zero-Cross Trim & Loop: frame aborted, closing (" .. tostring(open) .. ")\n")
     end
     if BST_ZC_LIVE == ctx then BST_ZC_LIVE = nil end
     -- no explicit DestroyContext: ReaImGui frees contexts when the script

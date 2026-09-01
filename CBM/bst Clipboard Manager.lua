@@ -409,6 +409,33 @@ local function entry_load()
   for _, e in ipairs(t.entries or {}) do
     if e.kind == 'item' or e.kind == 'track' or e.kind == 'marker'
        or e.kind == 'notes' or e.kind == 'envelope' then
+      -- 旧版本/外部数据防御: 补齐缺字段, 避免渲染/粘贴期 nil 拼接或格式化报错
+      if e.kind == 'track' and type(e.d) == 'table' then
+        e.d.name = tostring(e.d.name or '')
+        e.d.vol = tonumber(e.d.vol) or 1
+        e.d.pan = tonumber(e.d.pan) or 0
+        e.d.sends = tonumber(e.d.sends) or 0
+        e.d.recvs = tonumber(e.d.recvs) or 0
+        e.d.nchan = tonumber(e.d.nchan) or 2
+        if type(e.d.fx) == 'table' then
+          for fi, fx in ipairs(e.d.fx) do
+            if type(fx) == 'table' then
+              fx.name = tostring(fx.name or ('FX' .. (fi - 1)))
+              fx.preset = tostring(fx.preset or '')
+              if fx.on == nil then fx.on = true end
+            end
+          end
+        else
+          e.d.fx = {}
+        end
+      end
+      if e.kind == 'envelope' then
+        e.env_name = tostring(e.env_name or '包络')
+        if type(e.points) ~= 'table' then e.points = {} end
+      end
+      if e.kind == 'notes' and type(e.notes) ~= 'table' then e.notes = {} end
+      if e.kind == 'marker' and type(e.marks) ~= 'table' then e.marks = {} end
+      if e.kind == 'item' then e.pitch = tonumber(e.pitch) or 0 end
       keep[#keep+1] = e
     else
       dropped = dropped + 1
@@ -453,7 +480,8 @@ local function capture_items()
       e.len = e.len or 1
     elseif take then
       local src = pc(r.GetMediaItemTake_Source, take)
-      local _, fn = pc(r.GetMediaSourceFileName, src, '')
+      -- GetMediaSourceFileName 的 Lua 绑定只返回一个字符串, 解构两个值会让 fn 恒为 nil
+      local fn = pc(r.GetMediaSourceFileName, src, '')
       -- GetMediaSourceFileName 对带 <EXT ORIGINAL_FILENAME>/代理/片段源 可能返回空,
       -- 此时从 item chunk 的 FILE 行兜底解析真实源文件路径 (chunk 一定含 FILE)。
       if not fn or fn == '' then
@@ -502,8 +530,10 @@ local function parse_track_display(tr, chunk)
   for i = 0, (pc(r.TrackFX_GetCount, tr) or 0) - 1 do
     local _, nm = pc(r.TrackFX_GetFXName, tr, i, '')
     local _, preset = pc(r.TrackFX_GetPreset, tr, i, '')
-    local _, byp = pc(r.TrackFX_GetEnabled, tr, i)
-    d.fx[#d.fx+1] = { name = nm or ('FX' .. i), preset = preset or '', on = byp ~= false }
+    -- TrackFX_GetEnabled 只返回一个布尔, 解构两个值会让 bypass 恒为 "开启"
+    local enabled = pc(r.TrackFX_GetEnabled, tr, i)
+    d.fx[#d.fx+1] = { name = (nm and nm ~= '' and nm) or ('FX' .. i),
+                      preset = preset or '', on = enabled ~= false }
   end
   return d
 end
@@ -867,6 +897,9 @@ local function paste_entry(e, pos, track, slice_mode)
     if not it then msg = '创建 MIDI item 失败'
     else
       local take = r.GetActiveTake(it)
+      if type(e.notes) ~= 'table' or #e.notes == 0 then
+        msg = '该条目没有音符数据'
+      else
       local t0 = e.notes[1][1]
       local maxe = 0
       for _, nt in ipairs(e.notes) do
@@ -878,6 +911,7 @@ local function paste_entry(e, pos, track, slice_mode)
       local secs = r.TimeMap_QNToTime(qn0 + maxe / 960) - pos
       r.SetMediaItemInfo_Value(it, 'D_LENGTH', math.max(secs, 0.1))
       msg = ('已插入 %d 个音符'):format(#e.notes)
+      end
     end
 
   elseif kind == 'track' then
@@ -889,6 +923,10 @@ local function paste_entry(e, pos, track, slice_mode)
     msg = ok and '已插入轨道' or '轨道恢复失败'
 
   elseif kind == 'marker' then
+    if type(e.marks) ~= 'table' or #e.marks == 0 then
+      msg = '该条目没有标记数据'
+      return
+    end
     local t0 = e.marks[1].pos
     for _, m in ipairs(e.marks) do
       local rel = m.pos - t0
@@ -1719,8 +1757,11 @@ local function card_body(e, compact)
     local fxn = d.fx or {}
     for i = 1, math.min(#fxn, compact and 1 or 3) do
       local fx = fxn[i]
-      imgui.DrawList_AddText(dl, px + 28, yy, fx.on and PAL.green or PAL.red,
-        ('%s%s%s'):format(fx.name, fx.preset ~= '' and (' · ' .. fx.preset) or '', fx.on and '' or ' (bypass)'))
+      -- 旧数据可能缺 name/preset/on, 全部兜底, 避免插件行显示 "nil" 或拼接报错
+      local fxline = tostring(fx.name or ('FX' .. i))
+        .. (fx.preset and fx.preset ~= '' and (' · ' .. fx.preset) or '')
+        .. (fx.on and '' or ' (bypass)')
+      imgui.DrawList_AddText(dl, px + 28, yy, (fx.on ~= false) and PAL.green or PAL.red, fxline)
       yy = yy + 14
     end
     if #fxn > 3 then
@@ -1795,15 +1836,19 @@ local function card_body(e, compact)
       if e.sr and e.sr > 0 then meta[#meta+1] = ('%d Hz'):format(e.sr) end
       if e.nch and e.nch > 0 then meta[#meta+1] = e.nch .. 'ch' end
       if e.vol and e.vol ~= 1 then meta[#meta+1] = ('%.1f dB'):format(20 * math.log(math.max(e.vol, 0.0001), 10)) end
-      if e.pitch and e.pitch ~= 0 then meta[#meta+1] = ('pitch %+d'):format(e.pitch) end
-      if e.vw then meta[#meta+1] = ('%dx%d'):format(e.vw, e.vh) end
+      if e.pitch and e.pitch ~= 0 then
+        -- D_PITCH 可能是小数 (如 -0.5), %d 会抛 "number has no integer representation"
+        local p = ('%.2f'):format(e.pitch):gsub('0+$', ''):gsub('%.$', '')
+        meta[#meta+1] = 'pitch ' .. p
+      end
+      if e.vw and e.vh then meta[#meta+1] = ('%dx%d'):format(e.vw, e.vh) end
       if e.fps then meta[#meta+1] = ('%.2f fps'):format(e.fps) end
     elseif e.kind == 'notes' then
       meta[#meta+1] = #e.notes .. ' 音符'
     elseif e.kind == 'marker' then
       meta[#meta+1] = '原始位置保留, 拖出时整体平移'
     elseif e.kind == 'envelope' then
-      meta[#meta+1] = e.env_name .. ' · ' .. #e.points .. ' 点'
+      meta[#meta+1] = (e.env_name or '包络') .. ' · ' .. #(e.points or {}) .. ' 点'
     end
     if #meta > 0 then
       imgui.PushStyleColor(ctx, imgui.Col_Text, T.text_tri)

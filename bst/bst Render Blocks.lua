@@ -42,6 +42,7 @@ local st = {
   name     = "",
   gate     = lib.ext_getnum("rb_gate", 1),
   index_i  = math.floor(lib.ext_getnum("rb_index", 1)),
+  index_start = math.floor(lib.ext_getnum("rb_index_start", 1)),
   tail_ms  = lib.ext_getnum("rb_tail", 0),
   render_dir   = lib.ext_get("render_dir", ""),
   fmt_i    = math.floor(lib.ext_getnum("render_fmt_i", 1)),
@@ -51,7 +52,7 @@ local st = {
 local FMT_CODES = { "ZXZhdxgB", "ZXZhdxAB", "evaw" }
 local RATE_VALUES = { 0, 48000, 44100 }
 
-local msg, sev = "Select items and pack them into a block.", nil
+local msg, sev = "选中 item 后打包成块。", nil
 local err = nil
 math.randomseed(os.time())
 
@@ -101,7 +102,7 @@ local function pack(items, name)
   if not items or #items == 0 then return nil end
   -- refuse if any item is already grouped
   for _, it in ipairs(items) do
-    if gid_of(it) ~= 0 then msg, sev = "Selection contains grouped items - unpack first.", "warn"; return nil end
+    if gid_of(it) ~= 0 then msg, sev = "选中内容里已有分组的 item —— 请先解包。", "warn"; return nil end
   end
   local pmin, pmax = extents(items)
   local gid = unique_gid()
@@ -174,7 +175,7 @@ local function target_blocks()
     -- GetSet_LoopTimeRange returns (start, end) directly
     local ts, te = r.GetSet_LoopTimeRange(false, false, 0, 0, false)
     ts, te = ts or 0, te or 0
-    if te - ts < 1e-6 then return nil, "Select blocks or make a time selection.", "warn" end
+    if te - ts < 1e-6 then return nil, "请选中块，或框选一段时间。", "warn" end
     pool = {}
     for i = 0, r.CountMediaItems(0) - 1 do
       local it = r.GetMediaItem(0, i)
@@ -200,7 +201,7 @@ local function target_blocks()
     end
   end
   table.sort(blocks, function(a, b) return a.pos < b.pos end)
-  if #blocks == 0 then return nil, "No packed blocks found (pack first).", "warn" end
+  if #blocks == 0 then return nil, "没有找到已打包的块（请先打包）。", "warn" end
   return blocks
 end
 
@@ -235,10 +236,10 @@ local function act_pack()
   r.PreventUIRefresh(-1); r.UpdateArrange()
   if gid then
     r.Undo_EndBlock("bst: Pack block", -1)
-    msg, sev = "Packed " .. #sel .. " item(s) into a block.", "ok"
+    msg, sev = "已把 " .. #sel .. " 个 item 打包成一个块。", "ok"
   else
     r.Undo_EndBlock("bst: Pack block (nothing)", -1)
-    if #sel == 0 then msg, sev = "Select items to pack.", "warn" end
+    if #sel == 0 then msg, sev = "请先选中要打包的 item。", "warn" end
   end
 end
 
@@ -251,7 +252,7 @@ local function act_clusters()
   end
   r.PreventUIRefresh(-1); r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Pack %d cluster(s)", made), -1)
-  msg, sev = string.format("Packed %d cluster(s).", made), made > 0 and "ok" or "warn"
+  msg, sev = string.format("已打包 %d 个簇。", made), made > 0 and "ok" or "warn"
 end
 
 local function act_unpack()
@@ -259,16 +260,16 @@ local function act_unpack()
   local n = unpack_selected()
   r.PreventUIRefresh(-1); r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Unpack %d block(s)", n), -1)
-  msg, sev = string.format("Unpacked %d block(s).", n), n > 0 and "ok" or "warn"
+  msg, sev = string.format("已解包 %d 个块。", n), n > 0 and "ok" or "warn"
 end
 
 local function act_apply_name()
   local label = first_selected_block()
-  if not label then msg, sev = "Select something inside a block.", "warn"; return end
+  if not label then msg, sev = "请选中块内的 item。", "warn"; return end
   r.Undo_BeginBlock()
   r.GetSetMediaItemInfo_String(label, "P_NOTES", st.name, true)
   r.Undo_EndBlock("bst: Rename block", -1)
-  msg, sev = "Block named '" .. st.name .. "'.", "ok"
+  msg, sev = "块已命名为「" .. st.name .. "」。", "ok"
 end
 
 local function choose_folder()
@@ -280,7 +281,7 @@ local function choose_folder()
 end
 
 local function act_render()
-  if st.render_dir == "" then msg, sev = "Choose an output folder first.", "warn"; return end
+  if st.render_dir == "" then msg, sev = "请先选择输出目录。", "warn"; return end
   local blocks, m, s = target_blocks()
   if not blocks then msg, sev = m, s; return end
 
@@ -297,7 +298,7 @@ local function act_render()
     end
   end
   if #exported == 0 then
-    msg, sev = "Nothing to export (@ gate filtered everything?).", "warn"
+    msg, sev = "没有可导出的内容（@ 门把所有块都过滤掉了？）。", "warn"
     return
   end
 
@@ -305,9 +306,10 @@ local function act_render()
   r.Undo_BeginBlock()
   r.PreventUIRefresh(1)
   for bi, b in ipairs(exported) do
+    local num = bi - 1 + math.max(0, st.index_start)
     local suffix = ""
-    if st.index_i == 1 then suffix = string.format("_%02d", bi)
-    elseif st.index_i == 2 then suffix = string.format("_%03d", bi) end
+    if st.index_i == 1 then suffix = string.format("_%02d", num)
+    elseif st.index_i == 2 then suffix = string.format("_%03d", num) end
     local fname = lib.sanitize(b.name ~= "" and b.name or ("block_" .. bi)) .. suffix
     -- one MIXDOWN per block: item-mode renders would write one file per item
     lib.render_block_mixdown(b.audio, out_dir, {
@@ -321,7 +323,7 @@ local function act_render()
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Render %d block(s)", #exported), -1)
-  msg, sev = string.format("Rendered %d block(s) -> %s (%d gated off)",
+  msg, sev = string.format("已渲染 %d 个块 → %s（%d 个被 @ 门过滤）",
     #exported, out_dir, skipped_gate), "ok"
 end
 
@@ -331,24 +333,30 @@ local function draw_body()
   ImGui.Spacing(ctx)
 
   fl.begin_card(ctx, "##card_rb")
-    fl.caption(ctx, "BLOCKS")
+    fl.caption(ctx, "块")
     if fl.button(ctx, "Pack", { accent = true, width = 90 }) then act_pack() end
     ImGui.SameLine(ctx)
     if fl.button(ctx, "Unpack", { width = 90 }) then act_unpack() end
     ImGui.SameLine(ctx)
     if fl.button(ctx, "Pack clusters", { width = 110 }) then act_clusters() end
-    fl.caption(ctx, "Label = empty item spanning the group; edit/repack anytime")
+    fl.caption(ctx, "标签 = 覆盖整组的空 item；随时改名 / 重新打包")
   fl.end_card(ctx)
 
   ImGui.Dummy(ctx, 0, 2)
   fl.begin_card(ctx, "##card_name")
-    fl.caption(ctx, "NAMING")
+    fl.caption(ctx, "命名")
     local ch, v = ImGui.InputTextWithHint(ctx, "##rbname", "block name...", st.name)
     if ch then st.name = v end
     -- ReaImGui Combo takes a NUL-terminated item string and a 0-BASED index
     ch, v = ImGui.Combo(ctx, "Index##rbi", st.index_i - 1,
       table.concat(INDEX_MODES, "\0") .. "\0")
     if ch then st.index_i = math.floor(v) + 1; lib.ext_set("rb_index", st.index_i) end
+    ch, v = ImGui.InputInt(ctx, "Start##rbs", st.index_start)
+    if ch then
+      st.index_start = math.max(0, math.floor(v))
+      lib.ext_set("rb_index_start", st.index_start)
+    end
+    fl.caption(ctx, "序号 = 导出顺序累加; Index 选 (none) 则文件名不加序号")
     local nv = fl.toggle(ctx, "@ gate (only export names starting with @)",
       st.gate >= 1)
     if (nv and 1 or 0) ~= st.gate then st.gate = nv and 1 or 0; lib.ext_set("rb_gate", st.gate) end
@@ -359,12 +367,12 @@ local function draw_body()
 
   ImGui.Dummy(ctx, 0, 2)
   fl.begin_card(ctx, "##card_render")
-    fl.caption(ctx, "RENDER")
-    fl.caption(ctx, "Folder: " .. (st.render_dir ~= "" and st.render_dir or "(not set)"))
+    fl.caption(ctx, "渲染")
+    fl.caption(ctx, "目录：" .. (st.render_dir ~= "" and st.render_dir or "（未设置）"))
     if fl.button(ctx, "Choose folder...", { width = 130 }) then choose_folder() end
     ImGui.SameLine(ctx)
     if fl.button(ctx, "Format/rate from Toolbox", { subtle = true }) then
-      msg, sev = "Format & sample rate follow the SD Toolbox Render tab.", nil
+      msg, sev = "格式与采样率跟随 SD Toolbox 渲染页的设置。", nil
     end
     ch, v = ImGui.InputDouble(ctx, "Tail (ms)", st.tail_ms, 50, 500, '%.0f')
     if ch and v >= 0 then
@@ -375,11 +383,11 @@ local function draw_body()
     if fl.button(ctx, "RENDER BLOCKS", { accent = true, width = 200, height = 32 }) then
       act_render()
     end
-    fl.caption(ctx, "One mixdown per block - layered items summed, rendered through the master mix")
+    fl.caption(ctx, "每块一个混音文件 —— 块内分层 item 相加，经总线渲染")
   fl.end_card(ctx)
 
   if err then
-    fl.infobar(ctx, "bad", "Error: " .. tostring(err))
+    fl.infobar(ctx, "bad", "错误：" .. tostring(err))
   else
     fl.infobar(ctx, sev, msg)
   end
@@ -399,7 +407,8 @@ local function loop()
     local visible, op = ImGui.Begin(ctx, 'bst Render Blocks', true)
     if visible then
     local ok, e = pcall(draw_body)
-    err = ok and nil or tostring(e)
+    -- 不能写 `ok and nil or tostring(e)`：成功时会得到字符串 "nil"
+    if ok then err = nil else err = tostring(e) end
     if not ok then
       r.ShowConsoleMsg("bst Render Blocks: " .. tostring(e) .. "\n")
       for _ = 1, 8 do if not pcall(ImGui.EndChild, ctx) then break end end

@@ -43,7 +43,7 @@ local st = {
   fade_max   = lib.ext_getnum("vs_fade_max", 40),
 }
 
-local msg, sev = "Select audio items and generate.", nil
+local msg, sev = "选中音频 item 后生成。", nil
 local err = nil
 
 local function set_num(key, v) st[key] = v; lib.ext_set(key, v) end
@@ -66,12 +66,12 @@ local function save_preset(slot)
   for i, key in ipairs(PRESET_KEYS) do
     lib.ext_set(key .. "_p" .. slot, vals[i])
   end
-  msg, sev = "Saved preset " .. slot, "ok"
+  msg, sev = "已保存预设 " .. slot, "ok"
 end
 
 local function load_preset(slot)
   local first = lib.ext_get("vs_count_p" .. slot, "")
-  if first == "" then msg, sev = "Preset " .. slot .. " is empty.", "warn"; return end
+  if first == "" then msg, sev = "预设 " .. slot .. " 为空。", "warn"; return end
   st.count    = math.floor(tonumber(lib.ext_get("vs_count_p" .. slot)) or st.count)
   st.pitch_st = tonumber(lib.ext_get("var_pitch_st_p" .. slot)) or st.pitch_st
   st.vol_db   = tonumber(lib.ext_get("var_vol_db_p" .. slot)) or st.vol_db
@@ -81,12 +81,12 @@ local function load_preset(slot)
   st.place_i  = math.floor(tonumber(lib.ext_get("vs_place_p" .. slot)) or 1)
   st.fades    = tonumber(lib.ext_get("vs_fades_p" .. slot)) or 1
   st.fade_max = tonumber(lib.ext_get("vs_fade_max_p" .. slot)) or 40
-  msg, sev = "Loaded preset " .. slot, nil
+  msg, sev = "已加载预设 " .. slot, nil
 end
 
 local function act_generate()
   if r.CountSelectedMediaItems(0) == 0 then
-    msg, sev = "No items selected.", "warn"
+    msg, sev = "没有选中的 item。", "warn"
     return
   end
   math.randomseed(os.time())
@@ -105,7 +105,7 @@ local function act_generate()
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Generate %d variation(s)", created), -1)
-  msg, sev = string.format("Created %d variation(s) (%d skipped: MIDI/empty).",
+  msg, sev = string.format("已创建 %d 个变奏（跳过 %d：MIDI/空 item）。",
     created, #skipped), created > 0 and "ok" or "warn"
 end
 
@@ -115,7 +115,7 @@ local function draw_body()
   ImGui.Spacing(ctx)
 
   fl.begin_card(ctx, "##card_gen")
-    fl.caption(ctx, "RANDOMIZATION")
+    fl.caption(ctx, "随机化")
     local ch, v = ImGui.InputInt(ctx, "Count per item", st.count)
     if ch then set_num("vs_count", math.max(1, math.floor(v))) end
     ch, v = ImGui.SliderDouble(ctx, "Pitch +- (st)", st.pitch_st, 0, 12, '%.1f')
@@ -138,21 +138,21 @@ local function draw_body()
 
   ImGui.Dummy(ctx, 0, 2)
   fl.begin_card(ctx, "##card_place")
-    fl.caption(ctx, "PLACEMENT")
+    fl.caption(ctx, "排列方式")
     -- ReaImGui Combo takes a NUL-terminated item string and a 0-BASED index
     ch, v = ImGui.Combo(ctx, "Mode##place", st.place_i - 1,
       table.concat(PLACES, "\0") .. "\0")
     if ch then set_num("vs_place", math.floor(v) + 1) end
     if PLACE_KEYS[st.place_i] == "seq" then
-      fl.caption(ctx, "Copies placed sequentially - good before rendering")
+      fl.caption(ctx, "副本按顺序排列 —— 适合渲染前导出")
     else
-      fl.caption(ctx, "Layered at identical positions on a new VAR track")
+      fl.caption(ctx, "在同一位置分层堆叠到新的 VAR 轨")
     end
   fl.end_card(ctx)
 
   ImGui.Dummy(ctx, 0, 2)
   fl.begin_card(ctx, "##card_preset")
-    fl.caption(ctx, "PRESETS")
+    fl.caption(ctx, "预设")
     for slot = 1, 3 do
       if fl.button(ctx, "Save " .. slot, { width = 70 }) then save_preset(slot) end
       ImGui.SameLine(ctx)
@@ -167,7 +167,7 @@ local function draw_body()
   end
 
   if err then
-    fl.infobar(ctx, "bad", "Error: " .. tostring(err))
+    fl.infobar(ctx, "bad", "错误：" .. tostring(err))
   else
     fl.infobar(ctx, sev, msg)
   end
@@ -187,7 +187,8 @@ local function loop()
     local visible, op = ImGui.Begin(ctx, 'bst Variations Studio', true)
     if visible then
       local ok, e = pcall(draw_body)
-      err = ok and nil or tostring(e)
+      -- 不能写 `ok and nil or tostring(e)`：成功时会得到字符串 "nil"
+      if ok then err = nil else err = tostring(e) end
       if not ok then
         r.ShowConsoleMsg("bst Variations Studio: " .. tostring(e) .. "\n")
         -- a widget threw mid-card: close any child it left dangling so the

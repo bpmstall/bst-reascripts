@@ -11,7 +11,7 @@ local TARGET_DB = lib.ext_getnum("norm_target_db", -1.0)
 
 local items = lib.selected_items()
 if #items == 0 then
-  r.MB("Select at least one media item first.", "bst Normalize", 0)
+  r.MB("请先选中至少一个 item。", "bst 归一化", 0)
   return
 end
 
@@ -34,7 +34,7 @@ end
 
 r.PreventUIRefresh(-1)
 r.UpdateArrange()
-r.Undo_EndBlock(string.format("bst: Normalize %d item(s) to %.1f dBFS peak", done, TARGET_DB), -1)
+r.Undo_EndBlock(string.format("bst: 归一化 %d 个 item 到 %.1f dBFS 峰值", done, TARGET_DB), -1)
 r.ShowConsoleMsg(
-  string.format("bst Normalize: %d normalized to %.1f dBFS, %d skipped (MIDI/empty/silent)\n",
+  string.format("bst 归一化: %d 个已到 %.1f dBFS，跳过 %d 个（MIDI/空/静音）\n",
     done, TARGET_DB, skipped))

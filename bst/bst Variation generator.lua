@@ -15,7 +15,7 @@ local r = reaper
 
 local items = lib.selected_items()
 if #items == 0 then
-  r.MB("Select at least one media item first.", "bst Variations", 0)
+  r.MB("请先选中至少一个 item。", "bst 变奏生成器", 0)
   return
 end
 
@@ -35,6 +35,6 @@ local created, skipped = lib.generate_variations(items, {
 
 r.PreventUIRefresh(-1)
 r.UpdateArrange()
-r.Undo_EndBlock(string.format("bst: Generate %d variation(s)", created), -1)
-r.ShowConsoleMsg(string.format("bst Variations: %d created, %d skipped (%s)\n",
+r.Undo_EndBlock(string.format("bst: 生成 %d 个变奏", created), -1)
+r.ShowConsoleMsg(string.format("bst 变奏: 创建 %d 个，跳过 %d 个 (%s)\n",
   created, #skipped, table.concat(skipped, ", ")))

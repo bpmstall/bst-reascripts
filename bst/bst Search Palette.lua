@@ -138,16 +138,16 @@ end
 local function execute(res)
   if res.kind == "track" then
     r.SetOnlyTrackSelected(res.tr)
-    status = "Selected track: " .. res.name
+    status = "已选中轨道：" .. res.name
   elseif res.kind == "item" then
     r.Main_OnCommand(40289, 0) -- deselect all items
     r.SetMediaItemSelected(res.item, true)
     r.SetEditCurPos(r.GetMediaItemInfo_Value(res.item, "D_POSITION"), true, true)
     r.UpdateArrange()
-    status = "Selected item: " .. res.name
+    status = "已选中 item：" .. res.name
   elseif res.kind == "mark" then
     r.SetEditCurPos(res.pos, true, false)
-    status = "Cursor to " .. (res.isrgn and "region " or "marker ") .. res.name
+    status = "光标跳到 " .. (res.isrgn and "区域 " or "标记 ") .. res.name
   elseif res.kind == "script" then
     -- kb.ini stores bare RS ids; the runtime command name needs the "_"
     local id = r.NamedCommandLookup("_" .. res.cmdid)
@@ -156,17 +156,17 @@ local function execute(res)
       open = false
       r.Main_OnCommand(id, 0)
     else
-      status = "Cannot resolve: " .. res.cmdid
+      status = "无法解析动作：" .. res.cmdid
     end
   elseif res.kind == "fx" then
     local tr = r.GetSelectedTrack(0, 0)
     if not tr and r.CountTracks(0) > 0 then tr = r.GetTrack(0, r.CountTracks(0) - 1) end
-    if not tr then status = "Create/select a track first."; return end
+    if not tr then status = "请先创建/选中一条轨道。"; return end
     local pos = r.TrackFX_AddByName(tr, res.name, false, -1)
     if pos >= 0 then
-      status = string.format("Added %s to '%s'", res.name, (select(2, r.GetTrackName(tr))))
+      status = string.format("已把 %s 挂到「%s」", res.name, (select(2, r.GetTrackName(tr))))
     else
-      status = "Plugin not found: " .. res.name
+      status = "找不到插件：" .. res.name
     end
   end
 end
@@ -200,10 +200,12 @@ local function draw_body()
   end
 
   local w, h = ImGui.GetContentRegionAvail(ctx)
+  -- BeginChild 返回 false 时（子窗口被裁剪）绝不能调 EndChild，
+  -- 否则断言失败毒化整个 context —— 所以 EndChild 必须在 if 内配对
   if ImGui.BeginChild(ctx, "##results", w, h - 30) then
     for i, res in ipairs(results) do
       ImGui.PushStyleColor(ctx, ImGui.Col_Text, 0x4CC2FFFF)
-      ImGui.Text(ctx, TAG[res.kind])
+      ImGui.Text(ctx, TAG[res.kind] or "···")
       ImGui.PopStyleColor(ctx)
       ImGui.SameLine(ctx)
       if ImGui.Selectable(ctx, res.name .. "##r" .. i, i == sel) then
@@ -212,8 +214,8 @@ local function draw_body()
         query = ""; last_query = nil
       end
     end
+    ImGui.EndChild(ctx)
   end
-  ImGui.EndChild(ctx)
 
   if status ~= "" then fl.infobar(ctx, nil, status) end
 end
@@ -245,7 +247,7 @@ local function loop()
     if visible then
       local ok, e = pcall(draw_body)
       if not ok then
-        status = "error: " .. tostring(e)
+        status = "错误：" .. tostring(e)
         r.ShowConsoleMsg("bst Search Palette: " .. tostring(e) .. "\n")
         for _ = 1, 8 do if not pcall(ImGui.EndChild, ctx) then break end end
       end

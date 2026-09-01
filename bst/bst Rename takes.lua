@@ -11,7 +11,7 @@ local r = reaper
 
 local items = lib.selected_items()
 if #items == 0 then
-  r.MB("Select at least one media item first.", "Ox Rename", 0)
+  r.MB("请先选中至少一个 item。", "bst 重命名 take", 0)
   return
 end
 
@@ -56,6 +56,6 @@ r.UpdateArrange()
 r.Undo_EndBlock(string.format("bst: Rename %d take(s)", renamed), -1)
 if lib.last_error then
   r.ShowConsoleMsg(string.format(
-    "Ox Rename: stopped early - invalid find pattern (%s)\nApplied to the takes before it anyway.\n",
+    "bst 重命名: 提前停止 —— 查找模式无效 (%s)\n出错之前的 take 已应用。\n",
     lib.last_error))
 end

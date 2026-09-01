@@ -1,19 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="bst Scripts">
   <category name="BST Sound Tools">
+    <reapack name="bst Auto Doppler.lua" type="script" desc="自动多普勒: 按 item RMS 峰值自动写路径自动化 (nvk AUTODOPPLER 式, 需配套 bst_Doppler.jsfx)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Auto Doppler.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Auto%20Doppler.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst_Doppler.jsfx" type="effect" desc="路径驱动多普勒 JSFX (bst Auto Doppler 配套, 装到 Effects/bst/)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="Effects/bst/bst_Doppler.jsfx" type="effect">https://github.com/bpmstall/bst-reascripts/raw/main/Effects/bst/bst_Doppler.jsfx</source>
+      </version>
+    </reapack>
+    <reapack name="bst Loopmaker.lua" type="script" desc="无缝循环生成器: 零交叉+交叉淡化, 一键批量生成循环变奏 (nvk LOOPMAKER 式)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Loopmaker.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Loopmaker.lua</source>
+      </version>
+    </reapack>
     <reapack name="bst Normalize items.lua" type="script" desc="条目峰值归一化到目标 dBFS">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Normalize items.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Normalize%20items.lua</source>
+      </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Normalize items.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Normalize%20items.lua</source>
+        <changelog>提示信息中文化</changelog>
       </version>
     </reapack>
     <reapack name="bst Rename takes.lua" type="script" desc="批量重命名 take (合法文件名字符保护)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Rename takes.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Rename%20takes.lua</source>
       </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Rename takes.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Rename%20takes.lua</source>
+        <changelog>移除 Ox 残留命名, 提示信息中文化</changelog>
+      </version>
     </reapack>
     <reapack name="bst Render Blocks.lua" type="script" desc="渲染块管理 (LKC RenderBlocks 核心流程复刻)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
+      </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
+        <changelog>修复状态栏误报 Error: nil; 序号支持起始号可调(0/1); 部分标注中文化</changelog>
       </version>
     </reapack>
     <reapack name="bst Render selected items.lua" type="script" desc="选中条目静默批量渲染为 WAV">
@@ -25,25 +52,45 @@
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst SD Toolbox.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20SD%20Toolbox.lua</source>
       </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst SD Toolbox.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20SD%20Toolbox.lua</source>
+        <changelog>修复状态栏误报 Error: nil; Gap 设置持久化键修正 (var_gap_s); 部分标注中文化</changelog>
+      </version>
     </reapack>
     <reapack name="bst Search Palette.lua" type="script" desc="命令面板: 轨道/素材/标记/FX/脚本 模糊搜索直达">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Search Palette.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Search%20Palette.lua</source>
+      </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Search Palette.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Search%20Palette.lua</source>
+        <changelog>修复 BeginChild/EndChild 配对隐患(防 context 毒化); 部分标注中文化</changelog>
       </version>
     </reapack>
     <reapack name="bst Variation generator.lua" type="script" desc="快速生成素材变体">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Variation generator.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variation%20generator.lua</source>
       </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Variation generator.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variation%20generator.lua</source>
+        <changelog>提示信息中文化</changelog>
+      </version>
     </reapack>
     <reapack name="bst Variations Studio.lua" type="script" desc="素材变奏工作台 (nvk VARIATIONS 式)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Variations Studio.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Studio.lua</source>
       </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Variations Studio.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Studio.lua</source>
+        <changelog>修复状态栏误报 Error: nil; 部分标注中文化</changelog>
+      </version>
     </reapack>
     <reapack name="bst Zero-Cross Trim &amp; Loop.lua" type="script" desc="零交叉裁剪与循环制作">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Zero-Cross Trim &amp; Loop.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Zero-Cross%20Trim%20%26%20Loop.lua</source>
+      </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst Zero-Cross Trim &amp; Loop.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Zero-Cross%20Trim%20%26%20Loop.lua</source>
+        <changelog>修复状态栏误报 Error: nil; 窗口标题去 Ox 残留; 部分标注中文化</changelog>
       </version>
     </reapack>
     <reapack name="bst_fluent.lua" type="script" desc="Fluent 2 设计系统库 (被其他 bst 脚本加载, 请整组安装)">
@@ -54,6 +101,10 @@
     <reapack name="bst_lib.lua" type="script" desc="共享引擎库 (被其他 bst 脚本加载, 请整组安装)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst_lib.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst_lib.lua</source>
+      </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="bst/bst_lib.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst_lib.lua</source>
+        <changelog>新增 window_item (内容窗口克隆) 与 item_rms_peak_time (RMS 峰值时刻分析)</changelog>
       </version>
     </reapack>
   </category>
@@ -87,6 +138,10 @@
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
       </version>
+      <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>修复轨道卡片插件(FX)行显示 nil; 修复 FX 旁通状态恒为开启; 修复源文件名解析恒走兜底; 修复小数音分导致元数据行报错; 旧数据加载防御修补</changelog>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
@@ -107,7 +162,7 @@
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Settings.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Settings.lua</source>
       </version>
-    </reapack>
+</reapack>
     <reapack name="bst Toggle Sidebar.lua" type="script" desc="显示/隐藏剪贴板管理器侧边栏">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Toggle Sidebar.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Toggle%20Sidebar.lua</source>

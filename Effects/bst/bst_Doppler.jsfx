@@ -1,0 +1,77 @@
+desc:bst Doppler (路径驱动多普勒)
+//bst Auto Doppler 配套效果器:
+//「路径位置」参数 0→1 由自动化驱动,模拟声源从左/远 → 经过听者 → 右/远。
+//  0.5 = 声源正好经过听者(最近点)。
+//建议: 自动化写 slider1(路径位置),线性包络即可。
+//tags: processing doppler pan pitch
+slider1:pos=0.5<0,1,0.001>路径位置 (自动化驱动)
+slider2:width=1.0<0,2,0.01>声像宽度
+slider3:dist=0.4<0,1,0.01>距离衰减
+slider4:shift=6<0,12,0.1>多普勒音高量 (半音)
+slider5:mix=1<0,1,0.01>效果混合
+slider6:bufsec=0.3<0.05,0.5,0.005>移调缓冲 (秒)
+in_pin:左
+in_pin:右
+out_pin:左
+out_pin:右
+
+@init
+wp = 0;
+delay = 0;
+
+@slider
+buflen = max(64, floor(bufsec * srate));
+bufL = 0;
+bufR = buflen + 16;
+wp = min(wp, buflen - 1);
+delay = min(max(delay, 16), buflen - 16);
+
+@sample
+// 路径几何: θ = pos*π, 横向 x 从 -1(左) 到 +1(右), 径向 z = sin(θ) (靠近程度)
+th = pos * $pi;
+x = -cos(th);
+z = sin(th);
+
+// 多普勒频移: 径向速度近似 ∝ cos(θ) —— 靠近升调, 远离降调
+v = 2 ^ ((shift * cos(th)) / 12);
+
+// 距离衰减: 最近点 1.0, 远处按 dist 收缩
+dg = 1 / (1 + dist * 3 * (1 - z));
+
+// 声像 (等功率)
+p = min(max(x * width, -1), 1);
+lg = cos((p + 1) * $pi / 4);
+rg = sin((p + 1) * $pi / 4);
+
+// ---- 变速读取 (双抽头交叉淡化, 隐藏环绕跳变) ----
+idx = wp - delay;
+idx < 0 ? idx += buflen;
+i0 = floor(idx); fr = idx - i0;
+i0 >= buflen ? i0 -= buflen;
+i1 = i0 + 1; i1 >= buflen ? i1 = 0;
+tA = bufL[i0] + (bufL[i1] - bufL[i0]) * fr;
+tB = bufR[i0] + (bufR[i1] - bufR[i0]) * fr;
+
+idx2 = idx - buflen * 0.5;
+idx2 < 0 ? idx2 += buflen;
+j0 = floor(idx2); fr2 = idx2 - j0;
+j0 >= buflen ? j0 -= buflen;
+j1 = j0 + 1; j1 >= buflen ? j1 = 0;
+uA = bufL[j0] + (bufL[j1] - bufL[j0]) * fr2;
+uB = bufR[j0] + (bufR[j1] - bufR[j0]) * fr2;
+
+wA = 1 - abs(idx / buflen * 2 - 1);
+wB = 1 - wA;
+wetL = (tA * wA + uA * wB) * dg;
+wetR = (tB * wA + uB * wB) * dg;
+
+// 写入循环缓冲
+bufL[wp] = spl0;
+bufR[wp] = spl1;
+wp += 1; wp >= buflen ? wp = 0;
+delay += (1 - v);
+delay > buflen - 16 ? delay = buflen - 16;
+delay < 16 ? delay = 16;
+
+spl0 = spl0 * (1 - mix) + wetL * lg * mix;
+spl1 = spl1 * (1 - mix) + wetR * rg * mix;

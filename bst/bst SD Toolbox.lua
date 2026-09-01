@@ -1,6 +1,6 @@
 -- bst: Sound Design Toolbox (Fluent 2 styled ReaImGui panel)
 -- Tabs: Variations | Fades | Normalize | Naming | Render | Session
--- UI built on bst_fluent.lua (WinUI tokens). Logic on lib.lua.
+-- UI built on bst_fluent.lua (WinUI tokens). Logic on bst_lib.lua.
 -- Settings persist globally (ExtState "OxTools") shared with bst *.lua scripts.
 
 local r = reaper
@@ -65,17 +65,17 @@ local FMT_CODES = { "ZXZhdxgB", "ZXZhdxAB", "evaw" }
 local SRATES = { "Project rate", "48000 Hz", "44100 Hz" }
 local RATE_VALUES = { 0, 48000, 44100 }
 
-local msg = "Select items in the arrange view, then run an action."
+local msg = "在编曲区选中 item 后执行操作。"
 local sev = nil -- "ok" | "warn" | "bad" | nil(info)
 local err = nil
 
 local BUSES = {
-  { key = "bus_DES", name = "DES", desc = "Designed",     rgb = { 232, 116,  33 } },
-  { key = "bus_AMB", name = "AMB", desc = "Ambience",     rgb = {  76, 175,  80 } },
-  { key = "bus_FOL", name = "FOL", desc = "Foley",        rgb = { 161, 106,  61 } },
-  { key = "bus_INT", name = "INT", desc = "Interface/UI", rgb = {   0, 188, 212 } },
-  { key = "bus_MX",  name = "MX",  desc = "Music",        rgb = { 156,  89, 182 } },
-  { key = "bus_DLG", name = "DLG", desc = "Dialogue",     rgb = {  63,  81, 181 } },
+  { key = "bus_DES", name = "DES", desc = "Designed",  rgb = { 232, 116,  33 } },
+  { key = "bus_AMB", name = "AMB", desc = "Ambience",    rgb = {  76, 175,  80 } },
+  { key = "bus_FOL", name = "FOL", desc = "Foley",      rgb = { 161, 106,  61 } },
+  { key = "bus_INT", name = "INT", desc = "Interface/UI",   rgb = {   0, 188, 212 } },
+  { key = "bus_MX",  name = "MX",  desc = "Music",      rgb = { 156,  89, 182 } },
+  { key = "bus_DLG", name = "DLG", desc = "Dialogue",      rgb = {  63,  81, 181 } },
 }
 
 --------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ end
 
 local function need_items()
   if r.CountSelectedMediaItems(0) == 0 then
-    msg, sev = "No items selected.", "warn"
+    msg, sev = "没有选中的 item。", "warn"
     return true
   end
   return false
@@ -148,7 +148,7 @@ local function act_generate()
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Generate %d variation(s)", created), -1)
-  msg, sev = string.format("Created %d variation(s).", created), "ok"
+  msg, sev = string.format("已创建 %d 个变奏。", created), "ok"
 end
 
 local function apply_fades(len_in, len_out)
@@ -166,7 +166,7 @@ local function apply_fades(len_in, len_out)
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Fades on %d item(s)", n), -1)
-  msg, sev = string.format("Applied fades to %d item(s).", n), "ok"
+  msg, sev = string.format("已为 %d 个 item 应用淡化。", n), "ok"
 end
 
 local function act_normalize()
@@ -187,7 +187,7 @@ local function act_normalize()
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Normalize %d item(s) to %.1f dBFS", done, st.norm_target), -1)
-  msg, sev = string.format("Normalized %d item(s) (%d skipped: MIDI/silent).",
+  msg, sev = string.format("已归一化 %d 个 item（跳过 %d：MIDI/静音）。",
     done, skipped), done > 0 and "ok" or "warn"
 end
 
@@ -207,9 +207,9 @@ local function act_rename()
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Rename %d take(s)", renamed), -1)
   if lib.last_error then
-    msg, sev = "Rename: invalid find pattern (" .. lib.last_error .. ")", "bad"
+    msg, sev = "重命名：查找模式无效 (" .. lib.last_error .. ")", "bad"
   else
-    msg, sev = string.format("Renamed %d take(s).", renamed), "ok"
+    msg, sev = string.format("已重命名 %d 个 take。", renamed), "ok"
   end
 end
 
@@ -218,14 +218,14 @@ local function choose_folder()
   if ok and d and d ~= "" then
     st.render_dir = d:gsub("[%/\\]+$", "")
     lib.ext_set("render_dir", st.render_dir)
-    msg, sev = "Output folder: " .. st.render_dir, nil
+    msg, sev = "输出目录：" .. st.render_dir, nil
   end
 end
 
 local function act_render()
   if need_items() then return end
   if st.render_dir == "" then
-    msg, sev = "Choose an output folder first.", "warn"
+    msg, sev = "请先选择输出目录。", "warn"
     return
   end
   local items = lib.selected_items()
@@ -236,7 +236,7 @@ local function act_render()
     srate   = RATE_VALUES[st.render_sr_i] or 0,
     mono    = st.render_mono >= 1,
   })
-  msg, sev = string.format("Rendered %d item(s) to %s", #items, out_dir), "ok"
+  msg, sev = string.format("已渲染 %d 个 item → %s", #items, out_dir), "ok"
 end
 
 local function act_session()
@@ -256,7 +256,7 @@ local function act_session()
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
   r.Undo_EndBlock(string.format("bst: Create %d bus track(s)", made), -1)
-  msg, sev = string.format("Created %d bus track(s) at project end.", made), "ok"
+  msg, sev = string.format("已在工程末尾创建 %d 条总线。", made), "ok"
 end
 
 --------------------------------------------------------------------------------
@@ -267,7 +267,13 @@ local function draw_tab_variations()
   slider_d("Pitch range +- (st)", "var_pitch_st", 0, 12, '%.1f')
   slider_d("Volume range +- (dB)", "var_vol_db", 0, 6, '%.1f')
   slider_d("Pan spread", "var_pan", 0, 1, '%.2f')
-  input_int("Gap (ms)##var", "var_gap_ms", 0)
+  -- 间隔持久化用 var_gap_s（秒），界面用毫秒；旧版误写 var_gap_ms 键已弃用
+  local ch, v = ImGui.InputInt(ctx, "Gap (ms)##var", st.var_gap_ms)
+  if ch then
+    v = math.max(0, math.floor(v))
+    st.var_gap_ms = v
+    lib.ext_set("var_gap_s", v / 1000)
+  end
   toggle_key("Preserve pitch (vs varispeed)", "var_ppitch")
   if fl.button(ctx, "Generate variations", { accent = true, width = 170 }) then
     act_generate()
@@ -293,7 +299,7 @@ local function draw_tab_normalize()
     act_normalize()
   end
   ImGui.SameLine(ctx)
-  fl.caption(ctx, "Scans real playback audio (incl. fades/pitch)")
+  fl.caption(ctx, "扫描实际播放音频（含淡化/音高）")
 end
 
 local function draw_tab_naming()
@@ -310,24 +316,24 @@ end
 
 local function draw_tab_render()
   fl.begin_card(ctx, "##card_render")
-    fl.caption(ctx, "EXPORT")
+    fl.caption(ctx, "导出")
     input_text("Filename pattern ($track $item...)", "render_pat")
-    combo("Format##rdr", "render_fmt_i", FMTS)
+    combo("格式##rdr", "render_fmt_i", FMTS)
     combo("Sample rate", "render_sr_i", SRATES)
     toggle_key("Force mono", "render_mono")
-    fl.caption(ctx, "Folder: " .. (st.render_dir ~= "" and st.render_dir or "(not set)"))
+    fl.caption(ctx, "目录：" .. (st.render_dir ~= "" and st.render_dir or "（未设置）"))
     if fl.button(ctx, "Choose folder...", { width = 130 }) then choose_folder() end
     ImGui.SameLine(ctx)
     if fl.button(ctx, "Render selected", { accent = true, width = 140 }) then act_render() end
   fl.end_card(ctx)
-  fl.caption(ctx, "Silent export, one WAV per item, project settings restored after.")
+  fl.caption(ctx, "静默导出，每个 item 一个 WAV，完成后恢复工程设置。")
 end
 
 local function draw_tab_session()
   ImGui.TextWrapped(ctx,
-    "Create a standard sound-design bus structure at project end (UCS-style prefixes).")
+    "在工程末尾创建标准音效总线结构（UCS 风格前缀）。")
   fl.begin_card(ctx, "##card_buses")
-    fl.caption(ctx, "BUSES")
+    fl.caption(ctx, "总线")
     for _, bus in ipairs(BUSES) do
       toggle_key(bus.name .. "  (" .. bus.desc .. ")", bus.key)
     end
@@ -350,7 +356,7 @@ local TABS = {
 local function draw_body()
   fl.subtitle(ctx, "Sound Design Toolbox")
   ImGui.Spacing(ctx)
-  if ImGui.BeginTabBar(ctx, 'ox_tabs') then
+  if ImGui.BeginTabBar(ctx, 'bst_tabs') then
     for _, tab in ipairs(TABS) do
       if ImGui.BeginTabItem(ctx, tab[1]) then
         ImGui.Spacing(ctx)
@@ -362,9 +368,9 @@ local function draw_body()
   end
   ImGui.Dummy(ctx, 0, 4)
   ImGui.Separator(ctx)
-  ImGui.TextDisabled(ctx, string.format("%d item(s) selected", r.CountSelectedMediaItems(0)))
+  ImGui.TextDisabled(ctx, string.format("已选中 %d 个 item", r.CountSelectedMediaItems(0)))
   if err then
-    fl.infobar(ctx, "bad", "Error: " .. tostring(err))
+    fl.infobar(ctx, "bad", "错误：" .. tostring(err))
   else
     fl.infobar(ctx, sev, msg)
   end
@@ -384,7 +390,9 @@ local function loop()
     local visible, op = ImGui.Begin(ctx, 'bst SD Toolbox', true)
     if visible then
       local ok, e = pcall(draw_body)
-      err = ok and nil or tostring(e)
+      -- 注意不能写 `ok and nil or tostring(e)`：成功时会得到字符串 "nil"，
+      -- 导致状态栏永远显示 "Error: nil"
+      if ok then err = nil else err = tostring(e) end
       if not ok then
         r.ShowConsoleMsg("bst SD Toolbox: " .. tostring(e) .. "\n")
         for _ = 1, 8 do if not pcall(ImGui.EndChild, ctx) then break end end

@@ -411,6 +411,85 @@ function M.rename_items(items, o)
   return renamed
 end
 
+-- Clone of an item's active take restricted to a project-time content window
+-- [p1, p2] (inside the item), placed on dest_track at pos. Keeps playrate /
+-- pitch / fades zeroed (caller decides fades). Returns new_item, new_take or
+-- nil, reason.
+function M.window_item(item, dest_track, pos, p1, p2)
+  local src_take = reaper.GetActiveTake(item)
+  if not src_take then return nil, "empty item" end
+  if reaper.TakeIsMIDI(src_take) then return nil, "MIDI take" end
+  local src = reaper.GetMediaItemTake_Source(src_take)
+  if not src then return nil, "no source" end
+  local fn = reaper.GetMediaSourceFileName(src)
+  if not fn or fn == "" then return nil, "no source file" end
+  local new_src = reaper.PCM_Source_CreateFromFile(fn)
+  if not new_src then return nil, "source load failed" end
+
+  local P0 = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+  local R  = reaper.GetMediaItemTakeInfo_Value(src_take, "D_PLAYRATE") or 1
+  local O0 = reaper.GetMediaItemTakeInfo_Value(src_take, "D_STARTOFFS") or 0
+  p1 = math.max(p1, P0)
+  p2 = math.min(p2, P0 + reaper.GetMediaItemInfo_Value(item, "D_LENGTH"))
+  if p2 - p1 <= 1e-6 then return nil, "empty window" end
+
+  local new_item = reaper.AddMediaItemToTrack(dest_track)
+  local new_take = reaper.AddTakeToMediaItem(new_item)
+  reaper.SetMediaItemTake_Source(new_take, new_src)
+  reaper.SetMediaItemInfo_Value(new_item, "D_POSITION", pos)
+  reaper.SetMediaItemInfo_Value(new_item, "D_LENGTH", p2 - p1)
+  reaper.SetMediaItemTakeInfo_Value(new_take, "D_STARTOFFS", O0 + (p1 - P0) * R)
+  reaper.SetMediaItemTakeInfo_Value(new_take, "D_PLAYRATE", R)
+  reaper.SetMediaItemTakeInfo_Value(new_take, "D_PITCH",
+    reaper.GetMediaItemTakeInfo_Value(src_take, "D_PITCH"))
+  reaper.SetMediaItemTakeInfo_Value(new_take, "B_PPITCH",
+    reaper.GetMediaItemTakeInfo_Value(src_take, "B_PPITCH"))
+  reaper.SetMediaItemTakeInfo_Value(new_take, "D_VOL",
+    reaper.GetMediaItemTakeInfo_Value(src_take, "D_VOL"))
+  reaper.SetMediaItemInfo_Value(new_item, "D_VOL",
+    reaper.GetMediaItemInfo_Value(item, "D_VOL"))
+  return new_item, new_take
+end
+
+-- Project time of the loudest RMS window (about 10 ms) an item plays.
+-- Peak-detection mode "none" returns the item center. nil if not scannable.
+function M.item_rms_peak_time(item, mode)
+  local pos = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+  local len = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
+  if mode == "none" then return pos + len / 2 end
+  local take = reaper.GetActiveTake(item)
+  if not take or reaper.TakeIsMIDI(take) then return nil end
+  local src = reaper.GetMediaItemTake_Source(take)
+  if not src then return nil end
+  local srate = reaper.GetMediaSourceSampleRate(src)
+  if not srate or srate < 1 then srate = 48000 end
+  local nch = reaper.GetMediaSourceNumChannels(src)
+  if not nch or nch < 1 then nch = 1 end
+
+  local aa = reaper.CreateTakeAudioAccessor(take)
+  if not aa then return nil end
+  local win = math.max(math.floor(srate * 0.010), 64)  -- ~10 ms RMS window
+  local best_rms, best_t, t = -1, nil, 0
+  local buf = reaper.new_array(nch * win + 16)
+  while t < len - 1e-6 do
+    local frames = math.min(win, math.max(1, math.ceil((len - t) * srate)))
+    buf.clear()
+    local rv = reaper.GetAudioAccessorSamples(aa, srate, nch, t, frames, buf)
+    if rv == 1 then
+      local tbl = buf.table(1, nch * frames)
+      local sum = 0
+      for j = 1, #tbl do sum = sum + tbl[j] * tbl[j] end
+      local rms = math.sqrt(sum / #tbl)
+      if rms > best_rms then best_rms = rms; best_t = pos + t + frames / srate / 2 end
+    elseif rv < 0 then
+      break
+    end
+    t = t + frames / srate
+  end
+  reaper.DestroyAudioAccessor(aa)
+  return best_t
+end
+
 -- ---------------------------------------------------------------- zero crossing
 -- Nearest sign-flip time (item time) around t within +/-window seconds. nil if none.
 function M.find_zero_cross(item, t, window)
