@@ -251,6 +251,10 @@
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
         <changelog>修复: 拖出轨道/标记条目在空工程或无有效目标轨道时误报「没有可用轨道」——这两类粘贴本不需要既有轨道, 现已跳过轨道解析</changelog>
       </version>
+      <version name="2.3" author="bpmstall" time="2026-09-01T23:50:00Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>FX 复制捕获修复: 支持单个 FX 复制 (裸 VST/CLAP/JS/AU chunk, 无 FXCHAIN 包裹); 剪贴板监视出错不再静默 (写控制台); 切片标记强化: 切口全高亮线+顶部三角旗+段号底牌+剪刀角标</changelog>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">

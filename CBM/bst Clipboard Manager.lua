@@ -288,7 +288,8 @@ local PAL = {
   wave_rms  = 0x93DCFFEE,  -- 波形 RMS 内芯 (同色系高亮)
   wave      = 0x74D2FFD8,  -- 主波色 (MIDI 音符/包络线共用)
   wave2     = 0x5E7A8CB4,  -- 次级元素 (未选中音符): 灰蓝, 去紫
-  wave_dim  = 0x74D2FF80,  -- 切片虚线等次级提示
+  wave_dim  = 0x74D2FF80,  -- 次级提示
+  slice     = 0xFFD166F0,  -- 切片切口 (暖金, 与波形蓝高对比)
 
   -- 选区 (中性白, 低透明度底 + 实线边)
   sel     = 0xFFFFFF20,
@@ -1403,6 +1404,17 @@ local function watch_clipboard()
       log(('[CBM] 检测到复制包络 (%d 点), 已捕获\n'):format(#e.points))
     end
   else
+    -- 裸 FX chunk: 在 FX 链窗口 Ctrl+C 复制单个 FX (无 <FXCHAIN 包裹) → 一样入板
+    if big:match('^%s*<%s*VST%d*%s') or big:match('^%s*<%s*CLAP%s')
+       or big:match('^%s*<%s*JS%s') or big:match('^%s*<%s*AU') then
+      local e = entry_from_fxchain_chunk(big)
+      e.key = entry_key(e)
+      if not key_exists(e.key) then
+        add_entry(e)
+        log(('[CBM] 检测到复制 FX (%s), 已捕获\n'):format(e.title or 'FX'))
+      end
+      return
+    end
     -- 纯文本: 媒体浏览器/资源管理器复制的媒体文件路径 → 直接成条目
     local path = big:match('^%s*([%a]:[\\/][^\r\n]+)') or big:match('^%s*(\\\\[^\r\n]+)')
     path = path and path:gsub('%s+$', '')
@@ -1685,17 +1697,34 @@ local function draw_waveform(e, x, y, w, h)
       local a0 = e.sel and e.sel.a or e.win.a
       local b0 = e.sel and e.sel.b or e.win.b
       local sspan = math.max(b0 - a0, 0.001)
-      -- 虚线分隔 + 段数角标
+      -- 切口: 全高亮线 + 顶部倒三角旗标
       for i = 1, #cuts - 1 do
         local cx = x + (cuts[i] - a0) / sspan * w
         if cx > x + 1 and cx < x + w - 1 then
-          for dy = 0, h - 4, 4 do
-            imgui.DrawList_AddLine(dl, cx, y + dy, cx, y + math.min(dy + 2, h), PAL.wave_dim)
-          end
+          imgui.DrawList_AddLine(dl, cx, y, cx, y + h, PAL.slice, 1)
+          imgui.DrawList_AddTriangleFilled(dl, cx - 4, y, cx + 4, y, cx, y + 6, PAL.slice)
         end
       end
+      -- 段号 (每段中点, 小圆角底牌)
+      for i = 1, #cuts - 1 do
+        local ca = x + (cuts[i] - a0) / sspan * w
+        local cb = x + (cuts[i + 1] - a0) / sspan * w
+        if cb - ca > 18 then
+          local num = tostring(i)
+          local nw = select(1, imgui.CalcTextSize(ctx, num))
+          local nx = (ca + cb) / 2 - nw / 2
+          imgui.DrawList_AddRectFilled(dl, nx - 3, y + 2, nx + nw + 3, y + 15,
+            with_alpha(PAL.bg2, 0xC8), 3)
+          imgui.DrawList_AddText(dl, nx, y + 3, PAL.wave_rms, num)
+        end
+      end
+      -- 剪刀角标 (右下)
       local nsegs = #cuts - 1
-      imgui.DrawList_AddText(dl, x + w - 48, y + 2, PAL.wave_dim, ('%d 段'):format(nsegs))
+      local badge = ('✂ %d 段'):format(nsegs)
+      local btw = select(1, imgui.CalcTextSize(ctx, badge))
+      imgui.DrawList_AddRectFilled(dl, x + w - btw - 12, y + h - 18, x + w - 2, y + h - 4,
+        with_alpha(PAL.bg2, 0xC8), 4)
+      imgui.DrawList_AddText(dl, x + w - btw - 8, y + h - 17, PAL.wave_rms, badge)
     end
   end
 
@@ -2284,8 +2313,12 @@ local function frame()
   -- 「📁 本项目」面板跟随当前工程
   sync_proj_board()
 
-  -- Ctrl+C 复制 item/track → 自动捕获 (纯文本忽略)
-  pc(watch_clipboard)
+  -- Ctrl+C 复制 item/track/FX 链 → 自动捕获; 出错写控制台而不是静默吞掉
+  local okw, errw = pcall(watch_clipboard)
+  if not okw then
+    log('[CBM] 剪贴板监视出错: ' .. tostring(errw) .. '\n')
+    S.last_clip_key = nil -- 允许同内容下次重试
+  end
 
   -- 持久化防抖
   if S.dirty and os.clock() - S.last_save > 1.0 then
