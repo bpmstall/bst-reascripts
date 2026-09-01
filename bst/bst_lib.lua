@@ -301,7 +301,10 @@ end
 --   gap_s (spacing after source item), ppitch (bool), suffix_base,
 --   place ("seq" = sequential after source on same track [default],
 --          "stack" = all variations at identical positions on a new "<track> VAR" track),
---   fade_max_ms (>0 = randomize each variation's fades up to this length)
+--   fade_max_ms (>0 = randomize each variation's fades up to this length),
+--   prob_pitch/prob_vol/prob_pan (0..100, 每变奏应用该属性的概率, 默认 100),
+--   vol_only_down (bool, 音量只减不增, 默认 false),
+--   content_pct (0..100, take 起点在源文件范围内的随机内容偏移幅度, 0=关)
 -- Returns created count, skipped list. Caller owns the undo block.
 function M.generate_variations(items, o)
   o.count    = math.max(1, math.floor(o.count or 1))
@@ -334,29 +337,58 @@ function M.generate_variations(items, o)
     local base_name = M.take_name(reaper.GetActiveTake(item))
     if base_name == "" then base_name = "sfx" end
 
+    local prob_pitch = math.max(0, math.min(o.prob_pitch or 100, 100))
+    local prob_vol = math.max(0, math.min(o.prob_vol or 100, 100))
+    local prob_pan = math.max(0, math.min(o.prob_pan or 100, 100))
+    local content_pct = math.max(0, math.min(o.content_pct or 0, 100))
+
     for k = 1, o.count do
       local vpos = stack and pos or (pos + (len + o.gap_s) * k)
       -- clone_item returns (item, take) on success, (nil, reason) on failure
       local new_item, new_take = M.clone_item(item, dest_track, vpos)
       if new_item then
-        if o.pitch_st > 0 then
+        if o.pitch_st > 0 and math.random(100) <= prob_pitch then
           local cur = reaper.GetMediaItemTakeInfo_Value(new_take, "D_PITCH")
           reaper.SetMediaItemTakeInfo_Value(new_take, "D_PITCH", cur + M.rand_sym(o.pitch_st))
           -- B_PPITCH is a numeric property: 1/0, never a Lua boolean
           reaper.SetMediaItemTakeInfo_Value(new_take, "B_PPITCH", (o.ppitch ~= false) and 1 or 0)
         end
-        if o.vol_db > 0 then
+        if o.vol_db > 0 and math.random(100) <= prob_vol then
           local cur = reaper.GetMediaItemInfo_Value(new_item, "D_VOL")
-          reaper.SetMediaItemInfo_Value(new_item, "D_VOL", cur * M.db2lin(M.rand_sym(o.vol_db)))
+          local delta = M.rand_sym(o.vol_db)
+          -- vol_only_down: 变奏只比源小声 (LKC Variator 行为), delta 取负半轴
+          if o.vol_only_down then delta = -math.abs(delta) end
+          reaper.SetMediaItemInfo_Value(new_item, "D_VOL", cur * M.db2lin(delta))
         end
-        if o.pan > 0 then
+        if o.pan > 0 and math.random(100) <= prob_pan then
           local cur = reaper.GetMediaItemTakeInfo_Value(new_take, "D_PAN")
           reaper.SetMediaItemTakeInfo_Value(new_take, "D_PAN", M.clamp(cur + M.rand_sym(o.pan), -1, 1))
         end
+        -- 内容偏移: take 起点在源文件可动范围内随机平移 (0 <= soffs <= src_len - len*rate)
+        if content_pct > 0 then
+          local rate = reaper.GetMediaItemTakeInfo_Value(new_take, "D_PLAYRATE") or 1
+          local soffs = reaper.GetMediaItemTakeInfo_Value(new_take, "D_STARTOFFS") or 0
+          local src = reaper.GetMediaItemTake_Source(new_take)
+          local src_len = src and reaper.GetMediaSourceLength(src) or nil
+          local win = len * rate
+          if src_len and src_len > win * 1.05 then
+            local room = src_len - win
+            local shift = M.rand_sym(content_pct / 100 * room)
+            local ns = M.clamp(soffs + shift, 0, room)
+            reaper.SetMediaItemTakeInfo_Value(new_take, "D_STARTOFFS", ns)
+          end
+        end
         if o.fade_max_ms and o.fade_max_ms > 0 then
           local fmax = o.fade_max_ms / 1000
-          reaper.SetMediaItemInfo_Value(new_item, "D_FADEINLEN", math.random() * fmax)
-          reaper.SetMediaItemInfo_Value(new_item, "D_FADEOUTLEN", math.random() * fmax)
+          local fin, fout = math.random() * fmax, math.random() * fmax
+          -- 防重叠: 淡入+淡出不超过 item 长度的 60%, 超出按比例缩
+          local cap = len * 0.6
+          if fin + fout > cap and fin + fout > 0 then
+            local s = cap / (fin + fout)
+            fin, fout = fin * s, fout * s
+          end
+          reaper.SetMediaItemInfo_Value(new_item, "D_FADEINLEN", fin)
+          reaper.SetMediaItemInfo_Value(new_item, "D_FADEOUTLEN", fout)
         end
         M.set_take_name(new_take, string.format("%s%s%02d", base_name, o.suffix_base, k))
         created = created + 1

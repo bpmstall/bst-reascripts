@@ -41,6 +41,9 @@ local st = {
   place_i    = math.floor(lib.ext_getnum("vs_place", 1)),
   fades      = lib.ext_getnum("vs_fades", 1),
   fade_max   = lib.ext_getnum("vs_fade_max", 40),
+  vol_down   = lib.ext_getnum("vs_vol_down", 1),
+  content    = lib.ext_getnum("vs_content", 0),
+  prob       = lib.ext_getnum("vs_prob", 100),
 }
 
 local msg, sev = "选中音频 item 后生成。", nil
@@ -50,7 +53,7 @@ local function set_num(key, v) st[key] = v; lib.ext_set(key, v) end
 
 local PRESET_KEYS =
   { "vs_count","var_pitch_st","var_vol_db","var_pan","var_gap_s","var_ppitch",
-    "vs_place","vs_fades","vs_fade_max" }
+    "vs_place","vs_fades","vs_fade_max","vs_vol_down","vs_content","vs_prob" }
 
 local function save_preset(slot)
   local vals = {}
@@ -63,6 +66,9 @@ local function save_preset(slot)
   vals[#vals+1] = tostring(st.place_i)
   vals[#vals+1] = tostring(st.fades)
   vals[#vals+1] = tostring(st.fade_max)
+  vals[#vals+1] = tostring(st.vol_down)
+  vals[#vals+1] = tostring(st.content)
+  vals[#vals+1] = tostring(st.prob)
   for i, key in ipairs(PRESET_KEYS) do
     lib.ext_set(key .. "_p" .. slot, vals[i])
   end
@@ -81,6 +87,9 @@ local function load_preset(slot)
   st.place_i  = math.floor(tonumber(lib.ext_get("vs_place_p" .. slot)) or 1)
   st.fades    = tonumber(lib.ext_get("vs_fades_p" .. slot)) or 1
   st.fade_max = tonumber(lib.ext_get("vs_fade_max_p" .. slot)) or 40
+  st.vol_down = tonumber(lib.ext_get("vs_vol_down_p" .. slot)) or 1
+  st.content  = tonumber(lib.ext_get("vs_content_p" .. slot)) or 0
+  st.prob     = tonumber(lib.ext_get("vs_prob_p" .. slot)) or 100
   msg, sev = "已加载预设 " .. slot, nil
 end
 
@@ -101,6 +110,11 @@ local function act_generate()
     ppitch      = st.ppitch >= 1,
     place       = PLACE_KEYS[st.place_i] or "seq",
     fade_max_ms = st.fades >= 1 and st.fade_max or 0,
+    prob_pitch  = st.prob,
+    prob_vol    = st.prob,
+    prob_pan    = st.prob,
+    vol_only_down = st.vol_down >= 1,
+    content_pct = st.content,
   })
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
@@ -134,6 +148,12 @@ local function draw_body()
       ch, v = ImGui.InputDouble(ctx, "Max fade (ms)", st.fade_max, 10, 100, '%.0f')
       if ch then set_num("vs_fade_max", math.max(1, v)) end
     end
+    nv = fl.toggle(ctx, "音量只减不增 (变奏不比源大声)", st.vol_down >= 1)
+    if (nv and 1 or 0) ~= st.vol_down then set_num("vs_vol_down", nv and 1 or 0) end
+    ch, v = ImGui.SliderInt(ctx, "属性概率 % (变奏有几率不带该属性)", st.prob, 5, 100, '%d%%')
+    if ch then set_num("vs_prob", math.floor(v)) end
+    ch, v = ImGui.SliderInt(ctx, "内容偏移 % (take 起点在源内随机平移)", st.content, 0, 100, '%d%%')
+    if ch then set_num("vs_content", math.floor(v)) end
   fl.end_card(ctx)
 
   ImGui.Dummy(ctx, 0, 2)

@@ -11,6 +11,11 @@
         <source main="main" file="Effects/bst/bst_Doppler.jsfx" type="effect">https://github.com/bpmstall/bst-reascripts/raw/main/Effects/bst/bst_Doppler.jsfx</source>
       </version>
     </reapack>
+    <reapack name="bst Decontaminate.lua" type="script" desc="一键还原选中 item (vol/pan/pitch/rate), 变奏探索后回干净态">
+      <version name="1.0" author="bpmstall" time="2026-09-01T22:00:00Z">
+        <source main="main" file="bst/bst Decontaminate.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Decontaminate.lua</source>
+      </version>
+    </reapack>
     <reapack name="bst Loopmaker.lua" type="script" desc="无缝循环生成器: 零交叉+交叉淡化, 一键批量生成循环变奏 (nvk LOOPMAKER 式)">
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Loopmaker.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Loopmaker.lua</source>
@@ -41,6 +46,10 @@
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
         <changelog>修复状态栏误报 Error: nil; 序号支持起始号可调(0/1); 部分标注中文化</changelog>
+      </version>
+      <version name="1.2" author="bpmstall" time="2026-09-01T22:00:00Z">
+        <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
+        <changelog>对标 LKC RenderBlocks: 渲染状态寄存 (标签 notes 写入 RBST 行) + 已渲染可视标记 (变绿) + 跳过已渲染 + 相对 tail (块长百分比) + 清除全部渲染标记</changelog>
       </version>
     </reapack>
     <reapack name="bst Render selected items.lua" type="script" desc="选中条目静默批量渲染为 WAV">
@@ -83,6 +92,10 @@
         <source main="main" file="bst/bst Variations Studio.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Studio.lua</source>
         <changelog>修复状态栏误报 Error: nil; 部分标注中文化</changelog>
       </version>
+      <version name="1.2" author="bpmstall" time="2026-09-01T22:00:00Z">
+        <source main="main" file="bst/bst Variations Studio.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Studio.lua</source>
+        <changelog>对标 LKC Variator: 属性概率 % (变奏有几率不带 pitch/vol/pan) + 音量只减不增 + 内容偏移 % (take 起点源内随机平移); 预设槽兼容新参数</changelog>
+      </version>
     </reapack>
     <reapack name="bst Zero-Cross Trim &amp; Loop.lua" type="script" desc="零交叉裁剪与循环制作">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
@@ -105,6 +118,10 @@
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst_lib.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst_lib.lua</source>
         <changelog>新增 window_item (内容窗口克隆) 与 item_rms_peak_time (RMS 峰值时刻分析)</changelog>
+      </version>
+      <version name="1.3" author="bpmstall" time="2026-09-01T22:00:00Z">
+        <source main="main" file="bst/bst_lib.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst_lib.lua</source>
+        <changelog>generate_variations 新参数: prob_pitch/vol/pan (属性概率), vol_only_down (只减不增), content_pct (源内内容偏移), 淡化随机防重叠 (in+out ≤ 60% 长度)</changelog>
       </version>
     </reapack>
   </category>

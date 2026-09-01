@@ -1,15 +1,20 @@
--- bst: Render Blocks (free equivalent of LKC RenderBlocks core workflow)
+-- bst: Render Blocks (LKC RenderBlocks 核心流程复刻 + 状态管理)
 -- A "block" = an empty label item + content items, joined with REAPER's native
 -- item grouping. Blocks render as one mixdown each (layered items inside a
 -- block are summed). Workflow: PACK -> NAME -> RENDER -> iterate.
 --
---  Pack        selection becomes one block (label spans the content extents)
---  Unpack      selected blocks: removes grouping + deletes the label item
+--  Pack            selection becomes one block (label spans the content extents)
+--  Unpack          selected blocks: removes grouping + deletes the label item
 --  Pack clusters   timeline-overlapping selected items become one block per cluster
 --  Name/index/@gate    naming editor; @ gate exports only blocks whose name
 --                      starts with '@' when enabled; index suffix per block order
---  Render      one WAV per block via the shared silent renderer
---              (through tracks or master, optional tail)
+--  Tail            绝对 ms 或 块长百分比 (相对 tail)
+--  Render          one WAV per block via the shared silent renderer;
+--                  渲染成功后标签写入 <RBST 状态行并变绿 (已渲染标记)
+--  跳过已渲染      只渲染没有标记的块; 清除渲染标记可全部复位
+--
+-- 标签 P_NOTES 结构: 第一行 = 块名 (导出文件名), 其余行 = 状态寄存
+--   "\n<RBST YYYYMMDD HH:MM>" = 已渲染标记 (改名会重置)
 
 local r = reaper
 
@@ -35,8 +40,10 @@ end
 local ctx = ImGui.CreateContext('bst Render Blocks')
 BST_RB_LIVE = ctx
 local BLOCK_COLOR = r.ColorToNative(76, 194, 255) | 0x1000000
+local RENDERED_COLOR = r.ColorToNative(102, 204, 128) | 0x1000000
 
 local INDEX_MODES = { "_01", "_001", "(none)" }
+local RBST_TAG = '<RBST '
 
 local st = {
   name     = "",
@@ -44,6 +51,9 @@ local st = {
   index_i  = math.floor(lib.ext_getnum("rb_index", 1)),
   index_start = math.floor(lib.ext_getnum("rb_index_start", 1)),
   tail_ms  = lib.ext_getnum("rb_tail", 0),
+  tail_mode = math.floor(lib.ext_getnum("rb_tail_mode", 1)), -- 1=绝对 ms, 2=块长 %
+  tail_pct = lib.ext_getnum("rb_tail_pct", 10),
+  skip_rendered = math.floor(lib.ext_getnum("rb_skip", 0)),
   render_dir   = lib.ext_get("render_dir", ""),
   fmt_i    = math.floor(lib.ext_getnum("render_fmt_i", 1)),
   sr_i     = math.floor(lib.ext_getnum("render_sr_i", 1)),
@@ -60,6 +70,24 @@ math.randomseed(os.time())
 -- block engine
 
 local function is_label(item) return r.GetActiveTake(item) == nil end
+
+-- 标签 notes: 第一行 = 块名, 后续 <RBST 行 = 状态寄存
+local function block_name(item)
+  local _, notes = r.GetSetMediaItemInfo_String(item, "P_NOTES", "", false)
+  notes = notes or ""
+  return (notes:match('^([^\n]*)') or ''), notes:find(RBST_TAG, 1, true) ~= nil
+end
+
+local function set_rendered(item, name)
+  r.GetSetMediaItemInfo_String(item, "P_NOTES",
+    name .. '\n' .. RBST_TAG .. os.date('%Y%m%d %H:%M'), true)
+  r.SetMediaItemInfo_Value(item, "I_CUSTOMCOLOR", RENDERED_COLOR)
+end
+
+local function clear_mark(item, name)
+  r.GetSetMediaItemInfo_String(item, "P_NOTES", name, true)
+  r.SetMediaItemInfo_Value(item, "I_CUSTOMCOLOR", BLOCK_COLOR)
+end
 
 local function gid_of(item)
   return math.floor(r.GetMediaItemInfo_Value(item, "I_GROUPID") or 0)
@@ -205,6 +233,16 @@ local function target_blocks()
   return blocks
 end
 
+-- 全工程的块标签 (清除渲染标记用)
+local function all_labels()
+  local t = {}
+  for i = 0, r.CountMediaItems(0) - 1 do
+    local it = r.GetMediaItem(0, i)
+    if is_label(it) and gid_of(it) ~= 0 then t[#t + 1] = it end
+  end
+  return t
+end
+
 local function first_selected_block()
   for _, it in ipairs(lib.selected_items()) do
     local g = gid_of(it)
@@ -217,17 +255,6 @@ end
 
 --------------------------------------------------------------------------------
 -- actions
-
-local function save_selection()
-  local t = {}
-  for i = 0, r.CountSelectedMediaItems(0) - 1 do t[#t + 1] = r.GetSelectedMediaItem(0, i) end
-  return t
-end
-
-local function restore_selection(t)
-  r.Main_OnCommand(40289, 0)
-  for _, it in ipairs(t) do r.SetMediaItemSelected(it, true) end
-end
 
 local function act_pack()
   r.Undo_BeginBlock(); r.PreventUIRefresh(1)
@@ -267,9 +294,23 @@ local function act_apply_name()
   local label = first_selected_block()
   if not label then msg, sev = "请选中块内的 item。", "warn"; return end
   r.Undo_BeginBlock()
+  -- 改名即重置状态寄存 (第一行才是块名)
   r.GetSetMediaItemInfo_String(label, "P_NOTES", st.name, true)
+  r.SetMediaItemInfo_Value(label, "I_CUSTOMCOLOR", BLOCK_COLOR)
   r.Undo_EndBlock("bst: Rename block", -1)
   msg, sev = "块已命名为「" .. st.name .. "」。", "ok"
+end
+
+local function act_clear_marks()
+  r.Undo_BeginBlock(); r.PreventUIRefresh(1)
+  local n = 0
+  for _, lb in ipairs(all_labels()) do
+    local name, rendered = block_name(lb)
+    if rendered then clear_mark(lb, name) n = n + 1 end
+  end
+  r.PreventUIRefresh(-1); r.UpdateArrange()
+  r.Undo_EndBlock(string.format("bst: 清除 %d 个渲染标记", n), -1)
+  msg, sev = string.format("已清除 %d 个渲染标记。", n), "ok"
 end
 
 local function choose_folder()
@@ -285,20 +326,22 @@ local function act_render()
   local blocks, m, s = target_blocks()
   if not blocks then msg, sev = m, s; return end
 
-  -- @ gate + naming
-  local exported, skipped_gate = {}, 0
+  -- @ gate + naming + 跳过已渲染
+  local exported, skipped_gate, skipped_done = {}, 0, 0
   for _, b in ipairs(blocks) do
-    local _, nm = r.GetSetMediaItemInfo_String(b.label, "P_NOTES", "", false)
+    local nm, rendered = block_name(b.label)
     nm = nm or ""
     if st.gate >= 1 and nm:sub(1, 1) ~= "@" then
       skipped_gate = skipped_gate + 1
+    elseif st.skip_rendered >= 1 and rendered then
+      skipped_done = skipped_done + 1
     elseif b.audio and #b.audio > 0 then
       b.name = (st.gate >= 1) and nm:sub(2) or nm
       exported[#exported + 1] = b
     end
   end
   if #exported == 0 then
-    msg, sev = "没有可导出的内容（@ 门把所有块都过滤掉了？）。", "warn"
+    msg, sev = "没有可导出的内容（@ 门/已渲染过滤掉了所有块？）。", "warn"
     return
   end
 
@@ -311,20 +354,29 @@ local function act_render()
     if st.index_i == 1 then suffix = string.format("_%02d", num)
     elseif st.index_i == 2 then suffix = string.format("_%03d", num) end
     local fname = lib.sanitize(b.name ~= "" and b.name or ("block_" .. bi)) .. suffix
+    -- tail: 绝对 ms 或 块长百分比
+    local _, pmaxb = extents(b.audio)
+    local block_len = math.max(pmaxb - b.pos, 0.01)
+    local tail_ms = st.tail_ms
+    if st.tail_mode == 2 then
+      tail_ms = math.floor(st.tail_pct / 100 * block_len * 1000 + 0.5)
+    end
     -- one MIXDOWN per block: item-mode renders would write one file per item
     lib.render_block_mixdown(b.audio, out_dir, {
       pattern    = fname,
       format     = FMT_CODES[st.fmt_i] or "evaw",
       srate      = RATE_VALUES[st.sr_i] or 0,
       mono       = st.mono >= 1,
-      tail_ms    = st.tail_ms,
+      tail_ms    = math.max(tail_ms, 0),
     })
+    -- 渲染成功 → 状态寄存 + 已渲染标记 (绿)
+    set_rendered(b.label, b.name)
   end
   r.PreventUIRefresh(-1)
   r.UpdateArrange()
-  r.Undo_EndBlock(string.format("bst: Render %d block(s)", #exported), -1)
-  msg, sev = string.format("已渲染 %d 个块 → %s（%d 个被 @ 门过滤）",
-    #exported, out_dir, skipped_gate), "ok"
+  r.Undo_EndBlock(string.format("bst: 渲染 %d 个块", #exported), -1)
+  msg, sev = string.format("已渲染 %d 个块 → %s（@ 门滤掉 %d，已渲染跳过 %d）",
+    #exported, out_dir, skipped_gate, skipped_done), "ok"
 end
 
 --------------------------------------------------------------------------------
@@ -360,8 +412,17 @@ local function draw_body()
     local nv = fl.toggle(ctx, "@ gate (only export names starting with @)",
       st.gate >= 1)
     if (nv and 1 or 0) ~= st.gate then st.gate = nv and 1 or 0; lib.ext_set("rb_gate", st.gate) end
+    nv = fl.toggle(ctx, "只渲染未标记的块 (跳过绿标签)", st.skip_rendered >= 1)
+    if (nv and 1 or 0) ~= st.skip_rendered then
+      st.skip_rendered = nv and 1 or 0
+      lib.ext_set("rb_skip", st.skip_rendered)
+    end
     if fl.button(ctx, "Apply name to first selected block", { width = 240 }) then
       act_apply_name()
+    end
+    fl.caption(ctx, "渲染过的块标签变绿并写入 <RBST 状态; 改名会重置标记")
+    if fl.button(ctx, "清除全部渲染标记", { subtle = true, width = 200 }) then
+      act_clear_marks()
     end
   fl.end_card(ctx)
 
@@ -369,16 +430,29 @@ local function draw_body()
   fl.begin_card(ctx, "##card_render")
     fl.caption(ctx, "渲染")
     fl.caption(ctx, "目录：" .. (st.render_dir ~= "" and st.render_dir or "（未设置）"))
-    if fl.button(ctx, "Choose folder...", { width = 130 }) then choose_folder() end
+    if fl.button(ctx, "选择目录...", { width = 130 }) then choose_folder() end
     ImGui.SameLine(ctx)
-    if fl.button(ctx, "Format/rate from Toolbox", { subtle = true }) then
+    if fl.button(ctx, "格式跟随工具箱", { subtle = true }) then
       msg, sev = "格式与采样率跟随 SD Toolbox 渲染页的设置。", nil
     end
-    ch, v = ImGui.InputDouble(ctx, "Tail (ms)", st.tail_ms, 50, 500, '%.0f')
-    if ch and v >= 0 then
-      st.tail_ms = math.floor(v)
-      lib.ext_set("rb_tail", st.tail_ms)
-      lib.ext_set("render_tail_ms", st.tail_ms)
+    ch, v = ImGui.Combo(ctx, "尾部类型##rbtm", st.tail_mode - 1, "绝对 ms\0块长 %\0")
+    if ch then
+      st.tail_mode = math.floor(v) + 1
+      lib.ext_set("rb_tail_mode", st.tail_mode)
+    end
+    if st.tail_mode == 2 then
+      ch, v = ImGui.InputDouble(ctx, "尾部 (%)##rbtp", st.tail_pct, 5, 25, '%.0f')
+      if ch and v >= 0 then
+        st.tail_pct = math.floor(v)
+        lib.ext_set("rb_tail_pct", st.tail_pct)
+      end
+    else
+      ch, v = ImGui.InputDouble(ctx, "Tail (ms)##rbt", st.tail_ms, 50, 500, '%.0f')
+      if ch and v >= 0 then
+        st.tail_ms = math.floor(v)
+        lib.ext_set("rb_tail", st.tail_ms)
+        lib.ext_set("render_tail_ms", st.tail_ms)
+      end
     end
     if fl.button(ctx, "RENDER BLOCKS", { accent = true, width = 200, height = 32 }) then
       act_render()
