@@ -255,6 +255,10 @@
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
         <changelog>FX 复制捕获修复: 支持单个 FX 复制 (裸 VST/CLAP/JS/AU chunk, 无 FXCHAIN 包裹); 剪贴板监视出错不再静默 (写控制台); 切片标记强化: 切口全高亮线+顶部三角旗+段号底牌+剪刀角标</changelog>
       </version>
+      <version name="2.4" author="bpmstall" time="2026-09-02T00:30:00Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>Smart Copy (Ctrl+C) 支持复制 FX 链: FX 链窗口聚焦时直接枚举轨道 FX 入板 (不依赖剪贴板文本, 之前被全局 Ctrl+C 拦截导致原生 FX 复制从未执行); 拖出提示改面板 toast (修 tooltip 字体回退显示 ?)</changelog>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">

@@ -13,6 +13,18 @@ local cnt_items  = reaper.CountSelectedMediaItems(0)
 local cnt_tracks = reaper.CountSelectedTracks(0)
 local env = reaper.GetSelectedEnvelope(0)
 
+-- 0) FX 链窗口聚焦 → 捕获聚焦轨道的 FX 链 (直接枚举轨道 FX, 不依赖剪贴板文本)
+local fok, ftr = reaper.GetFocusedFX()
+if fok and fok % 2 == 1 and ftr and ftr >= 0 then
+  CBM_CMD = 'capture_fxchain'
+  CBM_ARGS = { track = tostring(ftr + 1) }
+  local info = debug.getinfo(1, 'S')
+  local src = (info and info.source or ''):gsub('^@', '')
+  local dir = src:match('^(.*)[/' .. string.char(92) .. ']') or (reaper.GetResourcePath() .. '/Scripts')
+  dofile(dir .. '/bst Clipboard Manager.lua')
+  return
+end
+
 -- 1) 执行 REAPER 原生复制
 if cnt_items > 0 then
   reaper.Main_OnCommand(40698, 0)  -- Edit: Copy items

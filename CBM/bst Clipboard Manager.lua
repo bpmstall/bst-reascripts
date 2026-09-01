@@ -771,7 +771,42 @@ local function capture_envelope()
   return add_entry(e), e.title
 end
 
+-- 捕获轨道 FX 链 (Smart Copy 在 FX 链窗口聚焦时的主路径; 不依赖剪贴板文本)
+local function capture_fxchain(track_id)
+  local tr
+  if track_id and tonumber(track_id) then
+    tr = r.CSurf_TrackFromID(tonumber(track_id), false)
+  end
+  if not (tr and (pc(r.CSurf_TrackToID, tr, false) or 0) > 0) then
+    tr = r.GetSelectedTrack2(0, 0, false) or r.GetTrack(0, 0)
+  end
+  if not (tr and (pc(r.CSurf_TrackToID, tr, false) or 0) > 0) then
+    return nil, '没有可用轨道 (FX 链捕获)'
+  end
+  local n = pc(r.TrackFX_GetCount, tr) or 0
+  if n == 0 then return nil, '该轨道没有 FX' end
+  local fxn = {}
+  for i = 0, n - 1 do
+    local _, nm = pc(r.TrackFX_GetFXName, tr, i, '')
+    local _, preset = pc(r.TrackFX_GetPreset, tr, i, '')
+    local enabled = pc(r.TrackFX_GetEnabled, tr, i)
+    fxn[#fxn+1] = { name = (nm and nm ~= '' and nm) or ('FX' .. i),
+                    preset = preset or '', on = enabled ~= false }
+  end
+  local first = fxn[1].name
+  local e = { kind = 'fxchain', stype = 'LIVE',
+              d = { name = '', color = 0, fx = fxn, sends = 0, recvs = 0, vol = 1, pan = 0 } }
+  e.title = (first .. ((n > 1) and ('  +' .. (n - 1)) or '')):sub(1, 48)
+  local tid = pc(r.CSurf_TrackToID, tr, false)
+  return add_entry(e), ('已捕获 FX 链 (%d 个 FX) ← 轨道 %d'):format(n, tid or 1)
+end
+
 local function capture_auto()
+  -- FX 链窗口聚焦 → 直接捕获聚焦轨道的 FX 链 (Smart Copy 主路径, 不依赖剪贴板)
+  local fok, ftr = pc(r.GetFocusedFX)
+  if fok and fok % 2 == 1 and ftr and ftr >= 0 then
+    return capture_fxchain(tonumber(ftr + 1))
+  end
   if (r.CountSelectedMediaItems(0) or 0) > 0 then return capture_items() end
   if (r.CountSelectedTracks2(0, false) or 0) > 0 then return capture_tracks() end
   local ed = pc(r.MIDIEditor_GetActive)
@@ -1473,6 +1508,8 @@ local function exec_cmd(cmd, args)
     return true, 'version 2.1.0 entries ' .. #S.entries
   elseif cmd == 'capture' then
     local e, m = capture_auto() return e ~= nil, m or '失败'
+  elseif cmd == 'capture_fxchain' then
+    local e, m = capture_fxchain(args and args.track) return e ~= nil, m or '失败'
   elseif cmd == 'capture_items' then
     local e, m = capture_items() return e ~= nil, m or '失败'
   elseif cmd == 'capture_tracks' then
@@ -2358,11 +2395,10 @@ local function frame()
 
     -- 拖出释放: 在窗口有效上下文内、且每帧输入同步后判断松开
     if S.drag then
-      if S.drag.moved then
-        local tip = (S.ui.drop_mode or 'cursor') == 'mouse'
-          and '松开: 插入到鼠标脚下 | Shift=切片 | Ctrl=渲染导出'
-          or '松开: 插入到编辑光标 | Shift=切片 | Ctrl=渲染导出'
-        imgui.SetTooltip(ctx, tip)
+      if S.drag.moved and not S.drag.tipped then
+        S.drag.tipped = true
+        -- 拖出提示走面板 toast: tooltip 窗口字体回退会把中文渲染成 '?'
+        set_toast('info', '拖出中 — 松开: 插入 | Shift: 切片 | Ctrl: 渲染导出', 2.4)
       end
       if not imgui.IsMouseDown(ctx, 0) then
         if S.drag.moved then
