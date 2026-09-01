@@ -150,6 +150,10 @@
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
         <changelog>卡片头部降高; 波形提亮并标注 L/R 分隔; 跨窗口捕获: FX 链/轨道包络复制自动入板 (可回贴), 媒体浏览器文件路径自动成条目; FX 链可一键按名挂载到选中轨道</changelog>
       </version>
+      <version name="2.0" author="bpmstall" time="2026-09-01T19:30:00Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>多面板剪贴板: 通用面板 + 📁本项目(按工程独立) + 自建面板, 复制进入当前面板; 搜索升级: 通配符 (* ?) / 搜索记忆 / 通配符快捷面板; 类型筛选收纳为下拉 (带计数); 拖出 Ctrl+松开 = 渲染导出到工程 bst_clips/; 工具栏重构为两行 Fluent 布局</changelog>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">

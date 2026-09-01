@@ -331,12 +331,18 @@ local S = {
   entries = {}, next_id = 1, dirty = false, last_save = 0,
   visible = true, quit = false, drag = nil, wave_drag = nil, filter = '',
   kind_filter = 'all',
+  boards = { { id = 'global', name = '通用', entries = {} } },
+  active_board = 'global',
+  search_hist = {},
+  renaming = nil, renaming_name = nil,
   confirm_clear_until = 0,
   toast = nil,          -- { sev='ok'|'info'|'warn'|'bad', text='', exp=os.clock() }
   last_clip_key = nil, last_clip_poll = 0,
   set = { cap = 64, slice_mode = 'off', slice_fixed = 4, slice_thresh = 0.5, ffmpeg = '' },
   pv = {},  -- id -> { src, peaks, imgs, tex, thumb_key }
 }
+-- entries 即当前面板的 entries 表 (切换面板 = 重新绑定别名)
+S.boards[1].entries = S.entries
 
 local function set_toast(sev, text, secs)
   S.toast = { sev = sev, text = tostring(text or ''), exp = os.clock() + (secs or 2.5) }
@@ -357,6 +363,87 @@ local function set_save()
   r.SetExtState('CBM', 'settings', table.concat(t, ';'), true)
 end
 set_load()
+
+-- ============================ 多面板 (boards) ============================
+-- 通用面板全局共享; 「📁 本项目」按工程自动分板; 自定义面板按用途建。
+-- 复制/捕获永远进入当前激活面板; 切换面板后 S.entries 重新绑定。
+
+local function get_board(id)
+  for _, b in ipairs(S.boards) do if b.id == id then return b end end
+end
+
+local function project_key()
+  local _, fn = r.EnumProjects(-1)
+  if fn and fn ~= '' then return fn end
+  return 'unsaved'
+end
+
+local function project_name()
+  local _, fn = r.EnumProjects(-1)
+  if fn and fn ~= '' then return basename(fn) end
+  return '未保存工程'
+end
+
+local function switch_board(id)
+  local b = get_board(id)
+  if not b or id == S.active_board then return end
+  S.active_board = id
+  S.entries = b.entries
+  S.dirty = true
+  set_toast('info', '已切换到面板「' .. b.name .. '」(' .. #b.entries .. ' 条)', 1.6)
+end
+
+local function ensure_board(id, name)
+  local b = get_board(id)
+  if not b then
+    b = { id = id, name = name or id, entries = {} }
+    S.boards[#S.boards+1] = b
+    S.dirty = true
+  end
+  return b
+end
+
+-- 「本项目」模式: 面板跟随当前工程 (每工程一份独立历史)
+local function sync_proj_board()
+  if S.active_board:sub(1, 5) ~= 'proj:' then return end
+  local want = 'proj:' .. project_key()
+  local b = get_board(want)
+  if not b then b = ensure_board(want, '📁 ' .. project_name()) end
+  if S.active_board ~= want then
+    S.active_board = want
+    S.entries = b.entries
+  end
+end
+
+-- ============================ 搜索 (通配符 + 记忆) ============================
+local function wildcard_match(s, q)
+  if q == '' then return true end
+  if not q:find('%*') and not q:find('%?') then return s:find(q, 1, true) ~= nil end
+  -- * = 任意一串, ? = 单个字符, 其余按字面
+  local p = q:gsub('[%^%$%(%)%%%.%[%]%+%-%]', '%%%1')
+  p = p:gsub('%%%*', '.*'):gsub('%%%?', '.')
+  return s:match('^' .. p .. '$') ~= nil
+end
+
+local function hist_load()
+  S.search_hist = {}
+  local raw = r.GetExtState('CBM', 'search_hist') or ''
+  for term in raw:gmatch('[^\n]+') do S.search_hist[#S.search_hist+1] = term end
+end
+
+local function hist_add(term)
+  if not term or term == '' then return end
+  for i, v in ipairs(S.search_hist) do
+    if v == term then table.remove(S.search_hist, i) break end
+  end
+  table.insert(S.search_hist, 1, term)
+  while #S.search_hist > 12 do table.remove(S.search_hist) end
+  local parts = {}
+  for _, v in ipairs(S.search_hist) do parts[#parts+1] = v end
+  r.SetExtState('CBM', 'search_hist', table.concat(parts, '\n'), true)
+end
+
+hist_load()
 
 -- UI 设置 (拖出落点/窗口尺寸), 由 bst Settings.lua 面板写入, 主脚本读取
 S.ui = { drop_mode = 'cursor', win_w = 440, win_h = 800 }
@@ -426,8 +513,10 @@ local function remove_entry(id)
 end
 
 local function entry_save()
-  local t = { next_id = S.next_id, entries = {} }
-  for _, e in ipairs(S.entries) do t.entries[#t.entries+1] = e end
+  local t = { next_id = S.next_id, active = S.active_board, boards = {} }
+  for _, b in ipairs(S.boards) do
+    t.boards[#t.boards+1] = { id = b.id, name = b.name, entries = b.entries }
+  end
   write_file(ENTRIES, 'return ' .. ser(t) .. '\n')
 end
 
@@ -474,8 +563,34 @@ local function entry_load()
       dropped = dropped + 1
     end
   end
-  S.entries = keep
-  S.next_id = t.next_id or (#keep + 1)
+  -- v2 多面板结构优先; v1 旧格式 (单 entries) 整体归入通用面板
+  if type(t.boards) == 'table' and #t.boards > 0 then
+    local boards, total = {}, 0
+    for _, b in ipairs(t.boards) do
+      local list = {}
+      for _, e in ipairs(b.entries or {}) do
+        if e.kind == 'item' or e.kind == 'track' or e.kind == 'marker'
+           or e.kind == 'notes' or e.kind == 'envelope' or e.kind == 'fxchain' then
+          list[#list+1] = e
+        end
+      end
+      boards[#boards+1] = { id = tostring(b.id), name = tostring(b.name or b.id), entries = list }
+      total = total + #list
+    end
+    local has_global
+    for _, b in ipairs(boards) do if b.id == 'global' then has_global = true end end
+    if not has_global then table.insert(boards, 1, { id = 'global', name = '通用', entries = {} }) end
+    S.boards = boards
+    S.next_id = t.next_id or (total + 1)
+    S.active_board = 'global'
+    for _, b in ipairs(boards) do if b.id == t.active then S.active_board = t.active end end
+    S.entries = get_board(S.active_board).entries
+  else
+    S.boards = { { id = 'global', name = '通用', entries = keep } }
+    S.next_id = t.next_id or (#keep + 1)
+    S.active_board = 'global'
+    S.entries = S.boards[1].entries
+  end
   if dropped > 0 then S.dirty = true end  -- 下次防抖保存时写回干净文件
 end
 
@@ -1395,18 +1510,22 @@ local function exec_cmd(cmd, args)
     local e = find_entry(args.id)
     return export_entry(e, args.path)
   elseif cmd == 'clear' then
-    local n = #S.entries
-    for _, e in ipairs(S.entries) do
+    local b = get_board(S.active_board) or S.boards[1]
+    local n = #b.entries
+    for _, e in ipairs(b.entries) do
       if S.pv[e.id] and S.pv[e.id].src then pc(r.PCM_Source_Destroy, S.pv[e.id].src) end
     end
-    S.pv = {} S.entries = {} S.dirty = true
+    S.pv = {}
+    b.entries = {}
+    S.entries = b.entries
+    S.dirty = true
     -- 重置剪贴板监视状态: 清空后若再复制同一内容, 也能正常触发
     S.last_clip_key = nil
     S.last_clip_poll = os.clock()
     -- 立刻写盘, 而不是等 1s 防抖 (确保重启不复活旧条目)
     entry_save()
     S.dirty = false S.last_save = os.clock()
-    return true, ('已清空 %d 条'):format(n)
+    return true, ('已清空面板「%s」%d 条'):format(b.name, n)
   end
   return false, '未知命令: ' .. tostring(cmd)
 end
@@ -2159,6 +2278,9 @@ local function frame()
 
   ipc_poll()
 
+  -- 「📁 本项目」面板跟随当前工程
+  sync_proj_board()
+
   -- Ctrl+C 复制 item/track → 自动捕获 (纯文本忽略)
   pc(watch_clipboard)
 
@@ -2202,8 +2324,8 @@ local function frame()
     if S.drag then
       if S.drag.moved then
         local tip = (S.ui.drop_mode or 'cursor') == 'mouse'
-          and '松开以插入到鼠标脚下 (Shift=强制切片)'
-          or '松开以插入到编辑光标处 (Shift=强制切片)'
+          and '松开: 插入到鼠标脚下 | Shift=切片 | Ctrl=渲染导出'
+          or '松开: 插入到编辑光标 | Shift=切片 | Ctrl=渲染导出'
         imgui.SetTooltip(ctx, tip)
       end
       if not imgui.IsMouseDown(ctx, 0) then
@@ -2224,11 +2346,23 @@ local function frame()
             if not track_valid(track) then track = resolve_track() end
             local mods = imgui.GetKeyMods(ctx) or 0
             local shift = (mods & (imgui.Mod_Shift or 2)) ~= 0
-            local slice = shift and 'transients'
-              or (e.slice_mode ~= 'off' and e.slice_mode) or nil
-            local ok_d, msg_d = paste_entry(e, pos, track, slice)
-            set_toast(ok_d and 'ok' or 'bad', ('拖出 @%s · %s'):format(fmt_t(pos), msg_d or ''))
-            log(('[CBM] 拖放 @%s · %s\n'):format(fmt_t(pos), msg_d))
+            local ctrl = (mods & (imgui.Mod_Ctrl or 8)) ~= 0
+            if ctrl then
+              -- 渲染导出: 把条目写成文件落在工程媒体目录 bst_clips/ 下
+              local odir = r.GetProjectPath(''):gsub('[%/\\]+$', '') .. '/bst_clips/'
+              r.RecursiveCreateDirectory(odir, 0)
+              local fname = tostring(e.title or ('clip_' .. e.id))
+                :gsub('[%c%/\\:%*%?"<>|]+', '_')
+              local okx, msgx = exec_cmd('export', { id = tostring(e.id), path = odir .. fname })
+              set_toast(okx and 'ok' or 'bad', ('渲染导出 · %s'):format(msgx or ''))
+              log(('[CBM] 渲染导出: %s · %s\n'):format(odir .. fname, tostring(msgx)))
+            else
+              local slice = shift and 'transients'
+                or (e.slice_mode ~= 'off' and e.slice_mode) or nil
+              local ok_d, msg_d = paste_entry(e, pos, track, slice)
+              set_toast(ok_d and 'ok' or 'bad', ('拖出 @%s · %s'):format(fmt_t(pos), msg_d or ''))
+              log(('[CBM] 拖放 @%s · %s\n'):format(fmt_t(pos), msg_d))
+            end
           end
         end
         S.drag = nil
@@ -2243,28 +2377,153 @@ local function frame()
       S.toast = nil
     end
 
-    -- ===== 工具栏: 搜索 + 捕获 + 设置 + 清空(二次确认) =====
-    local cap_w, set_w, clr_w = 58, 52, compact and 44 or 52
-    local fw = math.max(w - cap_w - set_w - clr_w - 30, 60)
-    imgui.SetNextItemWidth(ctx, fw)
-    local ch_f, fv = imgui.InputTextWithHint(ctx, '##filter', '搜索标题…', S.filter or '')
-    if ch_f then S.filter = fv or '' end
-    imgui.SameLine(ctx)
-    if fl.button(ctx, '捕获', { accent = true, width = cap_w }) then
-      local ok_c, msg_c = exec_cmd('capture')
-      set_toast(ok_c and 'ok' or 'warn', msg_c or '')
-    end
-    if imgui.IsItemHovered(ctx) then
-      imgui.SetTooltip(ctx, '捕获当前选中\nitem / 轨道 / MIDI 音符 / 包络点 / 时间选区内的标记')
-    end
-    imgui.SameLine(ctx)
-    if fl.button(ctx, '设置', { subtle = true, width = set_w }) then
-      S.ff_test_msg = nil
-      imgui.OpenPopup(ctx, 'settings')
-    end
-    if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '打开设置') end
-    imgui.SameLine(ctx)
+    -- ===== 行 A: 面板栏 (剪贴板面板切换 / 类型收纳 / 设置) =====
     do
+      local ab = get_board(S.active_board) or S.boards[1]
+      local abname = ab and ab.name or '?'
+      if S.active_board:sub(1, 5) == 'proj:' then abname = '📁 ' .. project_name() end
+      local btxt = ('%s (%d)'):format(abname, #S.entries)
+      local btw = math.min(math.max(select(1, imgui.CalcTextSize(ctx, btxt)) + 24, 90), w - 170)
+      if fl.button(ctx, btxt, { width = btw }) then
+        imgui.OpenPopup(ctx, 'boards')
+      end
+      if imgui.IsItemHovered(ctx) then
+        imgui.SetTooltip(ctx, '剪贴板面板: 复制/捕获进入当前面板\n通用 | 📁 本项目(按工程独立) | 自定义面板')
+      end
+      imgui.SameLine(ctx)
+      local kind_lbl = '全部'
+      for _, kc in ipairs(KIND_CHIPS) do if kc.id == S.kind_filter then kind_lbl = kc.label end end
+      if fl.button(ctx, '类型: ' .. kind_lbl, { subtle = true, width = 96 }) then
+        imgui.OpenPopup(ctx, 'kinds')
+      end
+      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '按类型筛选 (收纳在下拉里)') end
+      imgui.SameLine(ctx)
+      if fl.button(ctx, '设置', { subtle = true, width = 52 }) then
+        S.ff_test_msg = nil
+        imgui.OpenPopup(ctx, 'settings')
+      end
+      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '打开设置') end
+    end
+    -- 面板切换弹窗
+    if imgui.BeginPopup(ctx, 'boards') then
+      for _, b in ipairs(S.boards) do
+        local nm = b.name
+        if b.id:sub(1, 5) == 'proj:' then nm = '📁 ' .. (basename(project_key()) ~= 'unsaved' and basename(project_key()) or b.name) end
+        if imgui.Selectable(ctx, ('%s  (%d)##b_%d'):format(nm, #b.entries, b.id), b.id == S.active_board) then
+          switch_board(b.id)
+        end
+      end
+      imgui.Dummy(ctx, 0, 2)
+      imgui.Separator(ctx)
+      imgui.Dummy(ctx, 0, 2)
+      if imgui.Selectable(ctx, '📁 本项目 (按工程独立)##proj') then
+        local want = 'proj:' .. project_key()
+        ensure_board(want, '📁 ' .. project_name())
+        switch_board(want)
+      end
+      imgui.Dummy(ctx, 0, 2)
+      if fl.button(ctx, '管理面板…', { subtle = true, width = -1 }) then
+        imgui.CloseCurrentPopup(ctx)
+        imgui.OpenPopup(ctx, 'boards_mgmt')
+      end
+      imgui.EndPopup(ctx)
+    end
+    -- 面板管理弹窗
+    if imgui.BeginPopup(ctx, 'boards_mgmt') then
+      fl.subtitle(ctx, '面板管理')
+      fl.caption(ctx, '各面板历史独立; 复制/捕获进入当前面板')
+      imgui.Dummy(ctx, 0, 3)
+      for bi, b in ipairs(S.boards) do
+        if imgui.Selectable(ctx, ((b.id == S.active_board) and '● ' or '○ ') .. b.name
+          .. '  (' .. #b.entries .. ')##mg' .. bi, b.id == S.active_board) then
+          switch_board(b.id)
+        end
+      end
+      imgui.Dummy(ctx, 0, 3)
+      imgui.Separator(ctx)
+      imgui.Dummy(ctx, 0, 3)
+      if S.renaming then
+        local ch_n, nv = imgui.InputTextWithHint(ctx, '##boardname', '输入面板名…', S.renaming_name or '')
+        if ch_n then S.renaming_name = nv end
+        imgui.SameLine(ctx)
+        if fl.button(ctx, '确定', { accent = true, width = 52 }) then
+          local nm = tostring(S.renaming_name or ''):gsub('^%s+', ''):gsub('%s+$', '')
+          if nm ~= '' then
+            if S.renaming == 'new' then
+              local id = 'user_' .. tostring(os.time())
+              ensure_board(id, nm)
+              switch_board(id)
+            else
+              local b = get_board(S.active_board)
+              if b then b.name = nm S.dirty = true end
+            end
+          end
+          S.renaming = nil
+        end
+      else
+        if fl.button(ctx, '新建面板', { width = 96 }) then
+          S.renaming = 'new' S.renaming_name = ''
+        end
+        imgui.SameLine(ctx)
+        if fl.button(ctx, '重命名当前', { subtle = true, width = 100 }) then
+          local b = get_board(S.active_board)
+          S.renaming = 'rename' S.renaming_name = b and b.name or ''
+        end
+      end
+      imgui.Dummy(ctx, 0, 3)
+      if fl.button(ctx, '清空当前面板', { danger = true, width = -1 }) then
+        local ok_x, msg_x = exec_cmd('clear')
+        set_toast(ok_x and 'ok' or 'bad', msg_x or '')
+      end
+      imgui.EndPopup(ctx)
+    end
+    -- 类型筛选弹窗
+    if imgui.BeginPopup(ctx, 'kinds') then
+      for _, kc in ipairs(KIND_CHIPS) do
+        local n = 0
+        for _, e in ipairs(S.entries) do if match_kind(e, kc.id) then n = n + 1 end end
+        if imgui.Selectable(ctx, ('%s  (%d)##k_%s'):format(kc.label, n, kc.id),
+                            S.kind_filter == kc.id) then
+          S.kind_filter = kc.id
+        end
+      end
+      imgui.EndPopup(ctx)
+    end
+
+    -- ===== 行 B: 搜索 (通配符/记忆) + 捕获 + 清空 =====
+    do
+      local cap_w, clr_w = 58, compact and 44 or 52
+      local hist_w, wild_w = 26, 28
+      local fw = math.max(w - cap_w - clr_w - hist_w - wild_w - 36, 60)
+      imgui.SetNextItemWidth(ctx, fw)
+      local ch_f, fv = imgui.InputTextWithHint(ctx, '##filter', '搜索  (* 任意一串  ? 单字符)', S.filter or '')
+      if ch_f then
+        if fv and fv ~= '' and imgui.IsItemFocused(ctx)
+           and (imgui.IsKeyPressed(ctx, imgui.Key_Enter)
+             or imgui.IsKeyPressed(ctx, imgui.Key_KeypadEnter)) then
+          hist_add(fv)
+        end
+        S.filter = fv or ''
+      end
+      imgui.SameLine(ctx)
+      if fl.button(ctx, '▼', { subtle = true, width = hist_w }) then
+        imgui.OpenPopup(ctx, 'search_hist')
+      end
+      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '搜索记忆 (搜索框内按 Enter 记录)') end
+      imgui.SameLine(ctx)
+      if fl.button(ctx, '＊', { subtle = true, width = wild_w }) then
+        imgui.OpenPopup(ctx, 'wildcards')
+      end
+      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '通配符快速填入') end
+      imgui.SameLine(ctx)
+      if fl.button(ctx, '捕获', { accent = true, width = cap_w }) then
+        local ok_c, msg_c = exec_cmd('capture')
+        set_toast(ok_c and 'ok' or 'warn', msg_c or '')
+      end
+      if imgui.IsItemHovered(ctx) then
+        imgui.SetTooltip(ctx, '捕获当前选中到当前面板\nitem / 轨道 / FX 链 / 包络 / MIDI / 标记')
+      end
+      imgui.SameLine(ctx)
       local confirming = os.clock() < (S.confirm_clear_until or 0)
       local lbl = confirming and '确认?' or (compact and '清' or '清空')
       local clicked
@@ -2280,10 +2539,38 @@ local function frame()
           set_toast(ok_x and 'ok' or 'bad', msg_x or '')
         else
           S.confirm_clear_until = os.clock() + 3
-          set_toast('warn', '再点一次「确认」清空全部条目', 3)
+          set_toast('warn', '再点一次「确认」清空当前面板', 3)
         end
       end
-      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '清空所有条目 (需二次确认)') end
+      if imgui.IsItemHovered(ctx) then imgui.SetTooltip(ctx, '清空当前面板全部条目 (需二次确认)') end
+    end
+    -- 搜索记忆弹窗
+    if imgui.BeginPopup(ctx, 'search_hist') then
+      if #S.search_hist == 0 then
+        imgui.TextDisabled(ctx, '(暂无记忆 — 在搜索框按 Enter 记录)')
+      else
+        for i, term in ipairs(S.search_hist) do
+          if imgui.Selectable(ctx, term .. '##h' .. i) then S.filter = term end
+        end
+        imgui.Dummy(ctx, 0, 2)
+        if fl.button(ctx, '清空记忆', { subtle = true, width = -1 }) then
+          S.search_hist = {}
+          r.SetExtState('CBM', 'search_hist', '', true)
+        end
+      end
+      imgui.EndPopup(ctx)
+    end
+    -- 通配符快捷面板
+    if imgui.BeginPopup(ctx, 'wildcards') then
+      fl.caption(ctx, '快速筛选 (点选填入搜索框)')
+      local presets = { '*.wav', '*.mid*', '*_loop*', '*_v*', 'kick*', 'sfx_*', '*.mp4' }
+      for _, pr in ipairs(presets) do
+        if imgui.Selectable(ctx, pr .. '##w') then S.filter = pr end
+      end
+      imgui.Dummy(ctx, 0, 2)
+      imgui.Separator(ctx)
+      fl.caption(ctx, '* = 任意一串    ? = 单个字符')
+      imgui.EndPopup(ctx)
     end
 
     -- ===== 设置弹窗 =====
@@ -2291,6 +2578,25 @@ local function frame()
       pcall(imgui.SetNextWindowSizeConstraints, ctx, 460, 0, 640, 1400)
       fl.subtitle(ctx, '设置')
       fl.caption(ctx, '与 bst Settings 面板实时互通, 改动立即生效')
+      fl.caption(ctx, '捕获/复制进入当前面板: ' ..
+        ((get_board(S.active_board) or S.boards[1]).name or '?'))
+      do
+        local dmodes = { { 'cursor', '编辑光标' }, { 'mouse', '鼠标脚下 (需 SWS)' } }
+        local dcur = ((S.ui.drop_mode or 'cursor') == 'mouse') and 2 or 1
+        if imgui.BeginCombo(ctx, '拖出落点##dropmode', dmodes[dcur][2]) then
+          for i, mm in ipairs(dmodes) do
+            if imgui.Selectable(ctx, mm[2], i == dcur) then
+              S.ui.drop_mode = mm[1]
+              r.SetExtState('CBM_UI', 'ui',
+                'drop_mode=' .. mm[1] .. ';win_w=' .. (S.ui.win_w or 440)
+                .. ';win_h=' .. (S.ui.win_h or 800), true)
+            end
+          end
+          imgui.EndCombo(ctx)
+        end
+      end
+      fl.caption(ctx, '拖出卡片: 松开=插入 · Ctrl+松开=渲染导出到 <工程>/bst_clips/')
+      imgui.Dummy(ctx, 0, 2)
 
       imgui.Dummy(ctx, 0, 4)
       fl.body(ctx, '捕获')
@@ -2388,13 +2694,6 @@ local function frame()
       imgui.EndPopup(ctx)
     end
 
-    -- ===== 类型筛选 chips =====
-    if #S.entries > 0 then
-      for i, kc in ipairs(KIND_CHIPS) do
-        if chip(kc.id, kc.label, S.kind_filter == kc.id) then S.kind_filter = kc.id end
-        if i < #KIND_CHIPS then imgui.SameLine(ctx, 0, 4) end
-      end
-    end
     imgui.Dummy(ctx, 0, 2)
 
     -- ===== 列表 / 空状态 =====
@@ -2417,9 +2716,10 @@ local function frame()
       imgui.Dummy(ctx, 0, 10)
       do
         local hints = {
-          '选中 item/轨道/标记/包络后点上方「捕获」',
-          'Ctrl+C 复制 item/轨道会自动入板',
-          '按住卡片「拖到编曲区」松开即插入',
+          '选中 item/轨道/FX链/包络后点「捕获」',
+          'Ctrl+C 复制 item/轨道/FX 链会自动入板',
+          '媒体浏览器复制的文件路径也会自动入板',
+          '拖出卡片: 松开插入 · Ctrl+松开渲染导出',
         }
         imgui.PushStyleColor(ctx, imgui.Col_Text, T.text_dis)
         for _, htxt in ipairs(hints) do
@@ -2446,7 +2746,7 @@ local function frame()
         -- 单张卡片异常不会打断 BeginChild/EndChild 配对
         for _, e in ipairs(S.entries) do
           if match_kind(e, S.kind_filter)
-             and (S.filter == '' or (e.title or ''):lower():find(S.filter:lower(), 1, true)) then
+             and (S.filter == '' or wildcard_match((e.title or ''):lower(), S.filter:lower())) then
             draw_card(e, compact)
             imgui.Dummy(ctx, 0, 4)
           end
@@ -2468,7 +2768,9 @@ local function frame()
       for _, kc in ipairs(KIND_CHIPS) do
         if kc.id == S.kind_filter and kc.id ~= 'all' then filt_lbl = kc.label end
       end
-      local stxt = string.format('%d 条目%s%s', n_shown,
+      local ab2 = get_board(S.active_board)
+      local stxt = string.format('%d 条目 · %s%s%s', n_shown,
+        (ab2 and ab2.name) or '?',
         filt_lbl and (' · ' .. filt_lbl) or '',
         (S.filter ~= '') and ' · 搜索中' or '')
       imgui.DrawList_AddText(dl, x1 + 10, y1 + 5, T.text_tri, stxt)
