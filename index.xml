@@ -158,6 +158,10 @@
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
         <changelog>工具栏行高压缩 (FramePadding 2.5); 面板切换改为配置式下拉 Combo (拆掉嵌套弹窗, 修复切换时 Missing End 报错); 面板重命名/删除移入设置弹窗</changelog>
       </version>
+      <version name="2.2" author="bpmstall" time="2026-09-01T20:40:00Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>修复: 拖出轨道/标记条目在空工程或无有效目标轨道时误报「没有可用轨道」——这两类粘贴本不需要既有轨道, 现已跳过轨道解析</changelog>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">

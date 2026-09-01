@@ -1019,10 +1019,13 @@ end
 local function paste_entry(e, pos, track, slice_mode)
   if not e then return false, '没有条目' end
   pos = pos or r.GetCursorPosition()
-  if not track_valid(track) then track = resolve_track() end
-  if not track_valid(track) then return false, '没有可用轨道' end
   local kind = e.kind
   local msg = ''
+  -- 轨道 (粘贴=新建轨道) 与标记 (工程级) 不依赖既有轨道, 空工程也能拖出
+  if kind ~= 'track' and kind ~= 'marker' then
+    if not track_valid(track) then track = resolve_track() end
+    if not track_valid(track) then return false, '没有可用轨道' end
+  end
 
   r.PreventUIRefresh(1)
   r.Undo_BeginBlock()
