@@ -69,22 +69,33 @@ math.randomseed(os.time())
 --------------------------------------------------------------------------------
 -- block engine
 
-local function is_label(item) return r.GetActiveTake(item) == nil end
+-- 指针防御: 上一次崩溃/撤销可能留下失效指针, 先验型再访问
+local function valid_item(item)
+  return item ~= nil and r.ValidatePtr(item, 'MediaItem*')
+end
+
+local function is_label(item)
+  if not valid_item(item) then return false end
+  return r.GetActiveTake(item) == nil
+end
 
 -- 标签 notes: 第一行 = 块名, 后续 <RBST 行 = 状态寄存
 local function block_name(item)
+  if not valid_item(item) then return '', false end
   local _, notes = r.GetSetMediaItemInfo_String(item, "P_NOTES", "", false)
   notes = notes or ""
   return (notes:match('^([^\n]*)') or ''), notes:find(RBST_TAG, 1, true) ~= nil
 end
 
 local function set_rendered(item, name)
+  if not valid_item(item) then return end
   r.GetSetMediaItemInfo_String(item, "P_NOTES",
     name .. '\n' .. RBST_TAG .. os.date('%Y%m%d %H:%M'), true)
   r.SetMediaItemInfo_Value(item, "I_CUSTOMCOLOR", RENDERED_COLOR)
 end
 
 local function clear_mark(item, name)
+  if not valid_item(item) then return end
   r.GetSetMediaItemInfo_String(item, "P_NOTES", name, true)
   r.SetMediaItemInfo_Value(item, "I_CUSTOMCOLOR", BLOCK_COLOR)
 end
@@ -256,61 +267,71 @@ end
 --------------------------------------------------------------------------------
 -- actions
 
+-- 动作统一跑在 pcall 里: Undo/PreventUIRefresh 无论成败都收尾, 错误显示到状态栏
+local function run_action(name, body)
+  r.Undo_BeginBlock()
+  r.PreventUIRefresh(1)
+  local ok, e = pcall(body)
+  r.PreventUIRefresh(-1)
+  r.UpdateArrange()
+  r.Undo_EndBlock(name, -1)
+  if not ok then msg, sev = tostring(e), "bad" end
+  return ok
+end
+
 local function act_pack()
-  r.Undo_BeginBlock(); r.PreventUIRefresh(1)
-  local sel = lib.selected_items()
-  local gid = pack(sel)
-  r.PreventUIRefresh(-1); r.UpdateArrange()
-  if gid then
-    r.Undo_EndBlock("bst: Pack block", -1)
+  local sel
+  if run_action("bst: Pack block", function()
+    sel = lib.selected_items()
+    if #sel > 0 then pack(sel) end
+  end) and sel and #sel > 0 then
     msg, sev = "已把 " .. #sel .. " 个 item 打包成一个块。", "ok"
-  else
-    r.Undo_EndBlock("bst: Pack block (nothing)", -1)
-    if #sel == 0 then msg, sev = "请先选中要打包的 item。", "warn" end
+  elseif sel and #sel == 0 then
+    msg, sev = "请先选中要打包的 item。", "warn"
   end
 end
 
 local function act_clusters()
-  r.Undo_BeginBlock(); r.PreventUIRefresh(1)
-  local groups = clusters(lib.selected_items())
   local made = 0
-  for _, grp in ipairs(groups) do
-    if pack(grp) then made = made + 1 end
+  if run_action(string.format("bst: Pack %d cluster(s)", made), function()
+    for _, grp in ipairs(clusters(lib.selected_items())) do
+      if pack(grp) then made = made + 1 end
+    end
+  end) then
+    msg, sev = string.format("已打包 %d 个簇。", made), made > 0 and "ok" or "warn"
   end
-  r.PreventUIRefresh(-1); r.UpdateArrange()
-  r.Undo_EndBlock(string.format("bst: Pack %d cluster(s)", made), -1)
-  msg, sev = string.format("已打包 %d 个簇。", made), made > 0 and "ok" or "warn"
 end
 
 local function act_unpack()
-  r.Undo_BeginBlock(); r.PreventUIRefresh(1)
-  local n = unpack_selected()
-  r.PreventUIRefresh(-1); r.UpdateArrange()
-  r.Undo_EndBlock(string.format("bst: Unpack %d block(s)", n), -1)
-  msg, sev = string.format("已解包 %d 个块。", n), n > 0 and "ok" or "warn"
+  local n = 0
+  if run_action("bst: Unpack blocks", function()
+    n = unpack_selected()
+  end) then
+    msg, sev = string.format("已解包 %d 个块。", n), n > 0 and "ok" or "warn"
+  end
 end
 
 local function act_apply_name()
   local label = first_selected_block()
   if not label then msg, sev = "请选中块内的 item。", "warn"; return end
-  r.Undo_BeginBlock()
-  -- 改名即重置状态寄存 (第一行才是块名)
-  r.GetSetMediaItemInfo_String(label, "P_NOTES", st.name, true)
-  r.SetMediaItemInfo_Value(label, "I_CUSTOMCOLOR", BLOCK_COLOR)
-  r.Undo_EndBlock("bst: Rename block", -1)
+  run_action("bst: Rename block", function()
+    -- 改名即重置状态寄存 (第一行才是块名)
+    r.GetSetMediaItemInfo_String(label, "P_NOTES", st.name, true)
+    r.SetMediaItemInfo_Value(label, "I_CUSTOMCOLOR", BLOCK_COLOR)
+  end)
   msg, sev = "块已命名为「" .. st.name .. "」。", "ok"
 end
 
 local function act_clear_marks()
-  r.Undo_BeginBlock(); r.PreventUIRefresh(1)
   local n = 0
-  for _, lb in ipairs(all_labels()) do
-    local name, rendered = block_name(lb)
-    if rendered then clear_mark(lb, name) n = n + 1 end
+  if run_action("bst: 清除渲染标记", function()
+    for _, lb in ipairs(all_labels()) do
+      local name, rendered = block_name(lb)
+      if rendered then clear_mark(lb, name) n = n + 1 end
+    end
+  end) then
+    msg, sev = string.format("已清除 %d 个渲染标记。", n), "ok"
   end
-  r.PreventUIRefresh(-1); r.UpdateArrange()
-  r.Undo_EndBlock(string.format("bst: 清除 %d 个渲染标记", n), -1)
-  msg, sev = string.format("已清除 %d 个渲染标记。", n), "ok"
 end
 
 local function choose_folder()
@@ -346,8 +367,7 @@ local function act_render()
   end
 
   local out_dir = st.render_dir:gsub("[%/\\]+$", "") .. "/"
-  r.Undo_BeginBlock()
-  r.PreventUIRefresh(1)
+  local ok_r = run_action("bst: Render blocks", function()
   for bi, b in ipairs(exported) do
     local num = bi - 1 + math.max(0, st.index_start)
     local suffix = ""
@@ -372,11 +392,11 @@ local function act_render()
     -- 渲染成功 → 状态寄存 + 已渲染标记 (绿)
     set_rendered(b.label, b.name)
   end
-  r.PreventUIRefresh(-1)
-  r.UpdateArrange()
-  r.Undo_EndBlock(string.format("bst: 渲染 %d 个块", #exported), -1)
-  msg, sev = string.format("已渲染 %d 个块 → %s（@ 门滤掉 %d，已渲染跳过 %d）",
-    #exported, out_dir, skipped_gate, skipped_done), "ok"
+  end)
+  if ok_r then
+    msg, sev = string.format("已渲染 %d 个块 → %s（@ 门滤掉 %d，已渲染跳过 %d）",
+      #exported, out_dir, skipped_gate, skipped_done), "ok"
+  end
 end
 
 --------------------------------------------------------------------------------
@@ -487,7 +507,7 @@ local function loop()
       r.ShowConsoleMsg("bst Render Blocks: " .. tostring(e) .. "\n")
       for _ = 1, 8 do if not pcall(ImGui.EndChild, ctx) then break end end
     end
-    ImGui.End(ctx)
+      if ImGui.ValidatePtr(ctx, 'ImGui_Context*') then ImGui.End(ctx) end
     end
     fl.pop_theme(ctx, nc, nv)
     return op

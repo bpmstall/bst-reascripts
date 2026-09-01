@@ -55,6 +55,10 @@
         <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
         <changelog>修复 Pack 崩溃: B_UISEL 传布尔被新版 REAPER 绑定拒绝 (number expected, got boolean), 改为数字 0</changelog>
       </version>
+      <version name="1.4" author="bpmstall" time="2026-09-01T23:10:00Z">
+        <source main="main" file="bst/bst Render Blocks.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Render%20Blocks.lua</source>
+        <changelog>加固: 块引擎指针校验 (崩溃/撤销后的失效指针不再报 GetActiveTake 错误); 全部动作包 pcall, Undo/PreventUIRefresh 必然收尾, 错误显示在状态栏而不是中断帧</changelog>
+      </version>
     </reapack>
     <reapack name="bst Render selected items.lua" type="script" desc="选中条目静默批量渲染为 WAV">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
