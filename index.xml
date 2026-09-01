@@ -142,6 +142,10 @@
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
         <changelog>修复轨道卡片插件(FX)行显示 nil; 修复 FX 旁通状态恒为开启; 修复源文件名解析恒走兜底; 修复小数音分导致元数据行报错; 旧数据加载防御修补</changelog>
       </version>
+      <version name="1.2" author="bpmstall" time="2026-09-01T17:30:00Z">
+        <source main="main" file="CBM/bst Clipboard Manager.lua">https://github.com/bpmstall/bst-reascripts/raw/main/CBM/bst%20Clipboard%20Manager.lua</source>
+        <changelog>预览配色重做 (MiniMeters 风: 峰值剪影+RMS 内芯, 去蓝紫); 卡片徽章/标题/时间像素级对齐; 支持 REAPER 全部源类型 (MIDI 源/工程引用/空 item/片段/反向); 复制内容去重 + 重元数据惰性加载</changelog>
+      </version>
     </reapack>
     <reapack name="bst Copy (Smart).lua" type="script" desc="智能复制: 按上下文复制 item/轨道/时间线并自动入历史 (建议绑定 Ctrl+C)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">

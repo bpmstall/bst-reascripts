@@ -270,26 +270,29 @@ local PAL = {
   -- 背景分层
   bg      = T.bg,
   card    = T.card,
-  -- 预览区数据可视化配色: 沿用原版柔和色值 (Fluent 高饱和 accent 在密集/
-  -- 等幅素材上会糊成蓝紫色块, 波形形状感全无 —— 用户实测反馈后还原)
-  bg2     = 0x0E0F12FF,
+  -- 预览区数据可视化配色 —— MiniMeters 风: 近黑微蓝底, 单一柔和蓝系,
+  -- 波形 = 峰值剪影(低透明) + RMS 内芯(高亮) 分层; 面板不再出现蓝紫撞色
+  bg2     = 0x12151BFF,
   field   = T.ctrl,
 
   -- 边框/分隔线
   border  = T.stroke,
   border_h= T.stroke_strong,
-  grid    = 0xFFFFFF14,
+  grid    = 0xFFFFFF12,
   grid_h  = T.stroke_strong,
 
   -- 主强调色
   accent  = T.accent,
   accent_d= with_alpha(T.accent, 0x90),
-  wave    = 0x6BCCE6FF,  -- 左声道 (原版柔青)
-  wave2   = 0x9E85E6FF,  -- 右声道/MIDI 辅助 (原版柔紫)
+  wave_peak = 0x4CC2FF30,  -- 波形峰值剪影 (accent 低透明填充)
+  wave_rms  = 0x74D2FFC8,  -- 波形 RMS 内芯 (同色系提亮)
+  wave      = 0x74D2FFD8,  -- 主波色 (MIDI 音符/包络线共用)
+  wave2     = 0x5E7A8CB4,  -- 次级元素 (未选中音符): 灰蓝, 去紫
+  wave_dim  = 0x74D2FF80,  -- 切片虚线等次级提示
 
-  -- 选区 (原版暖黄, 低透明度底 + 实线边)
-  sel     = 0xFACC5238,
-  selb    = 0xFAD166FF,
+  -- 选区 (中性白, 低透明度底 + 实线边)
+  sel     = 0xFFFFFF20,
+  selb    = 0xE9EFF5C0,
 
   -- 文本层级
   txt     = T.text_pri,
@@ -304,13 +307,17 @@ local PAL = {
   ink     = 0x1F1F1FFF,  -- 徽章上的深色文字
 }
 
-local KIND_LABEL = { item='音频', video='视频', image='图片', notes='MIDI', track='轨道', marker='标记', envelope='包络' }
+local KIND_LABEL = { item='音频', video='视频', image='图片', midi='MIDI', proj='工程',
+                     empty='空', notes='MIDI', track='轨道', marker='标记', envelope='包络' }
 -- 类型徽章分类色 (图表配色扩展, 基于 Fluent accent/warn/ok 系)
 local KIND_COLOR = {
-  item     = 0x4CC2FFFF,  -- 青 (音频)
-  video    = 0xCEB9FFFF,  -- 紫 (视频)
+  item     = 0x4CC2FFFF,  -- 蓝 (音频)
+  video    = 0xCEB9FFFF,  -- 淡紫 (视频)
   image    = 0x8AE0E8FF,  -- 青 (图片)
-  notes    = 0x86D78AFF,  -- 绿青 (MIDI)
+  midi     = 0x86D78AFF,  -- 绿 (MIDI 源)
+  proj     = 0xB9A0FBFF,  -- 紫灰 (工程引用)
+  empty    = 0xA8B2BCFF,  -- 灰 (空 item)
+  notes    = 0x86D78AFF,  -- 绿 (MIDI)
   track    = 0x76D7ADFF,  -- 薄荷 (轨道)
   marker   = T.warn,      -- 黄 (标记)
   envelope = 0xFFB36BFF,  -- 橙 (包络)
@@ -357,8 +364,24 @@ for k, v in ui_raw:gmatch('(%w+)=([^;\n]*)') do
   elseif k == 'drop_mode' then S.ui[k] = v end
 end
 
+local function entry_key(e)
+  -- 内容指纹: 同一对象重复复制/捕获时用于去重
+  return table.concat({ e.kind or '', e.file or e.title or '', e.stype or '',
+                        e.soffs or '', e.len or '', e.pitch or '' }, '|')
+end
+
 local function add_entry(e)
   if not e then return nil end
+  if e.key == nil then e.key = entry_key(e) end
+  -- 去重: 已有同内容条目 → 销毁其预览资源并移除, 新条目置顶 (时间刷新)
+  for i = #S.entries, 1, -1 do
+    local old = S.entries[i]
+    if old.key == e.key then
+      if S.pv[old.id] and S.pv[old.id].src then pc(r.PCM_Source_Destroy, S.pv[old.id].src) end
+      S.pv[old.id] = nil
+      table.remove(S.entries, i)
+    end
+  end
   e.id = S.next_id S.next_id = S.next_id + 1
   e.time = os.time()
   if e.kind == 'item' and not e.win then
@@ -467,6 +490,7 @@ local function capture_items()
       icolor = r.GetMediaItemInfo_Value(it, 'I_CUSTOMCOLOR'),
       chunk = chunk,
     }
+    e.stype = chunk:match('<SOURCE[ \t]*(%a+)')
     if take and r.TakeIsMIDI(take) then
       e.is_midi = true
       e.title = (r.GetTakeName(take) or 'MIDI'):sub(1, 48)
@@ -1014,6 +1038,9 @@ end
 -- 从 <ITEM ...> chunk 反解析出条目 (含波形元数据)
 local function entry_from_item_chunk(chunk)
   local e = { kind = 'item', chunk = chunk, rate = 1, soffs = 0 }
+  -- 顶层源类型 (REAPER 全部 <SOURCE 类型): WAVE/AIFF/MP3/OGG/FLAC/VIDEO/MIDI/
+  -- SECTION/REVERSE/SUBPROJECT/PROJREF/CLICK/LTC... 决定预览与徽章展示
+  e.stype = chunk:match('<SOURCE[ \t]*(%a+)')
   local len = chunk:match('\nLENGTH ([%d%.%-]+)')
   if len then e.len = tonumber(len) end
   local pos = chunk:match('\nPOSITION ([%d%.%-]+)')
@@ -1031,8 +1058,27 @@ local function entry_from_item_chunk(chunk)
     e.fsize = file_size(file)
     e.take_name = (name and name ~= '' and name) or basename(file)
   end
+  -- 无 FILE 行的源: 按类型归类 (SECTION/REVERSE 内嵌真实文件, 已由 FILE 兜底)
+  if not e.fclass then
+    if e.stype == 'MIDI' then e.fclass = 'midi'
+    elseif e.stype == 'SUBPROJECT' or e.stype == 'PROJREF' then e.fclass = 'proj'
+    elseif not e.stype then e.fclass = 'empty' end
+  end
   e.title = (e.take_name or (name and name ~= '' and name) or 'item'):sub(1, 48)
-  -- 音频源元数据 (视频/图片也尝试, 失败静默)
+  -- 预览窗口: 优先 item 片段 (soffs + len*rate)
+  if e.soffs and e.len then
+    e.win = { a = e.soffs, b = e.soffs + e.len * (e.rate or 1) }
+  elseif e.src_len then
+    e.win = { a = 0, b = e.src_len }
+  elseif e.len then
+    e.win = { a = 0, b = e.len }
+  end
+  return e
+end
+
+-- 重元数据 (PCM_Source 打开/视频探测): 剪贴板监视路径在去重之后才调用,
+-- 重复复制同一对象时不再白做源解析
+local function finalize_item_meta(e)
   if e.file and e.file ~= '' then
     local src = pc(r.PCM_Source_CreateFromFile, e.file)
     if src then
@@ -1046,15 +1092,10 @@ local function entry_from_item_chunk(chunk)
       if vw then e.vw, e.vh, e.fps = vw, vh, fps end
     end
   end
-  -- 预览窗口: 优先 item 片段 (soffs + len*rate)
-  if e.soffs and e.len then
-    e.win = { a = e.soffs, b = e.soffs + e.len * (e.rate or 1) }
-  elseif e.src_len then
-    e.win = { a = 0, b = e.src_len }
-  elseif e.len then
-    e.win = { a = 0, b = e.len }
-  end
-  return e
+end
+
+local function key_exists(key)
+  for _, old in ipairs(S.entries) do if old.key == key then return true end end
 end
 
 -- 从 <TRACK ...> chunk 反解析出轨道条目 (名称/颜色/FX 列表)
@@ -1094,8 +1135,13 @@ local function watch_clipboard()
     else
       local n_items = select(2, big:gsub('<ITEM', ''))
       if n_items == 1 then
-        add_entry(entry_from_item_chunk(big))
-        log('[CBM] 检测到复制 item, 已捕获\n')
+        local e = entry_from_item_chunk(big)
+        e.key = entry_key(e)
+        if not key_exists(e.key) then
+          finalize_item_meta(e)
+          add_entry(e)
+          log('[CBM] 检测到复制 item, 已捕获\n')
+        end
       else
         -- 多 item: 逐个按 <ITEM ...> 到闭合 > 切分
         local count = 0
@@ -1116,8 +1162,13 @@ local function watch_clipboard()
             close = (close or (s - 1)) + #line
           end
           close = close or #big
-          add_entry(entry_from_item_chunk(big:sub(s, close)))
-          count = count + 1
+          local e = entry_from_item_chunk(big:sub(s, close))
+          e.key = entry_key(e)
+          if not key_exists(e.key) then
+            finalize_item_meta(e)
+            add_entry(e)
+            count = count + 1
+          end
           pos = close + 1
         end
         log(('[CBM] 检测到复制 %d 个 item, 已捕获\n'):format(count))
@@ -1269,10 +1320,11 @@ local function nice_step(span)
   return 3600
 end
 
--- 音频波形
+-- 音频波形 (MiniMeters 风: 峰值剪影 + RMS 内芯, 单一柔和蓝系)
 local function draw_waveform(e, x, y, w, h)
   local dl = imgui.GetWindowDrawList(ctx)
-  imgui.DrawList_AddRectFilled(dl, x, y, x + w, y + h, PAL.bg2)
+  imgui.DrawList_AddRectFilled(dl, x, y, x + w, y + h, PAL.bg2, 4)
+  imgui.DrawList_AddRect(dl, x + 0.5, y + 0.5, x + w - 0.5, y + h - 0.5, PAL.grid, 4)
   local pv = S.pv[e.id]
   if not pv then S.pv[e.id] = {} pv = S.pv[e.id] end
   -- 源文件解析: e.file 可能为 nil(旧条目/视频)/含空白; 若缺失则从 chunk 的 FILE 行兜底
@@ -1308,37 +1360,55 @@ local function draw_waveform(e, x, y, w, h)
   local key = ('%.4f|%.4f|%d|%d'):format(e.win.a, e.win.b, math.floor(w), nch)
   if not pv.peaks or pv.peaks.key ~= key then
     local ns = math.min(math.max(math.floor(w), 16), 2048)
+    -- peakmode 0 = 峰值 min/max, 1 = RMS; 布局同为 [max 块 | min 块]
     local buf = r.new_array(ns * nch * 2 + 16) buf.clear()
     local rv = pc(r.PCM_Source_GetPeaks, pv.src, ns / span, e.win.a, nch, ns, 0, buf)
     local n = (rv and math.floor(rv) % 1048576) or 0
-    local t = {}
-    if n > 0 then t = buf.table(1, n * nch * 2) or {} end
-    pv.peaks = { key = key, n = n, t = t, ns = ns, nch = nch }
+    local t, rt, rn = {}, {}, 0
+    if n > 0 then
+      t = buf.table(1, n * nch * 2) or {}
+      buf.clear()
+      local rv2 = pc(r.PCM_Source_GetPeaks, pv.src, ns / span, e.win.a, nch, ns, 1, buf)
+      local n2 = (rv2 and math.floor(rv2) % 1048576) or 0
+      if n2 > 0 then rt = buf.table(1, n2 * nch * 2) or {} rn = n2 end
+    end
+    pv.peaks = { key = key, n = n, t = t, rt = rt, rn = rn, ns = ns, nch = nch }
   end
   local pk = pv.peaks
   local n = pk.n
   local half = h / 2
 
+  -- 峰值剪影(低透明) + RMS 内芯(高亮), 声道同色 —— MiniMeters 分层画法
+  local vpeak = 0.0001
+  for i = 1, n * nch do
+    local v = pk.t[i] or 0 if v > vpeak then vpeak = v end
+    v = pk.t[n * nch + i] or 0 if -v > vpeak then vpeak = -v end
+  end
+  if vpeak > 1 then vpeak = 1 end
+  local rn = pk.rn or 0
   local draw_ch = function(ci, yy, hh)
-    imgui.DrawList_AddLine(dl, x, yy + hh / 2, x + w, yy + hh / 2, PAL.grid)
-    local vpeak = 0.0001
-    for i = 1, n * nch do
-      local v = pk.t[i] or 0 if v > vpeak then vpeak = v end
-      v = pk.t[n * nch + i] or 0 if -v > vpeak then vpeak = -v end
-    end
-    if vpeak > 1 then vpeak = 1 end
+    local cy = yy + hh / 2
     for sx = 0, math.floor(w) - 1 do
       local si = math.floor(sx / w * n) + 1
       if si <= n then
-        local mx = pk.t[(si - 1) * nch + ci + 1] or 0
-        local mn = pk.t[n * nch + (si - 1) * nch + ci + 1] or 0
-        local y1 = yy + hh / 2 - math.max(mx, 0) / vpeak * (hh / 2) * 0.92
-        local y2 = yy + hh / 2 + math.max(-mn, 0) / vpeak * (hh / 2) * 0.92
+        local base = (si - 1) * nch + ci + 1
+        local mx = math.max(pk.t[base] or 0, 0)
+        local mn = math.max(-(pk.t[n * nch + base] or 0), 0)
+        local y1 = cy - mx / vpeak * (hh / 2) * 0.92
+        local y2 = cy + mn / vpeak * (hh / 2) * 0.92
         if y2 - y1 < 1 then y2 = y1 + 1 end
-        imgui.DrawList_AddRectFilled(dl, x + sx, y1, x + sx + 1, y2,
-          ci == 0 and PAL.wave or PAL.wave2)
+        imgui.DrawList_AddRectFilled(dl, x + sx, y1, x + sx + 1, y2, PAL.wave_peak)
+        if rn > 0 then
+          local rmx = math.max(pk.rt[base] or 0, 0)
+          local rmn = math.max(-(pk.rt[rn * nch + base] or 0), 0)
+          local ry1 = cy - rmx / vpeak * (hh / 2) * 0.92
+          local ry2 = cy + rmn / vpeak * (hh / 2) * 0.92
+          if ry2 - ry1 < 1 then ry2 = ry1 + 1 end
+          imgui.DrawList_AddRectFilled(dl, x + sx, ry1, x + sx + 1, ry2, PAL.wave_rms)
+        end
       end
     end
+    imgui.DrawList_AddLine(dl, x, cy, x + w, cy, PAL.grid)
   end
   if nch >= 2 then
     draw_ch(0, y, half)
@@ -1370,12 +1440,12 @@ local function draw_waveform(e, x, y, w, h)
         local cx = x + (cuts[i] - a0) / sspan * w
         if cx > x + 1 and cx < x + w - 1 then
           for dy = 0, h - 4, 4 do
-            imgui.DrawList_AddLine(dl, cx, y + dy, cx, y + math.min(dy + 2, h), PAL.wave2)
+            imgui.DrawList_AddLine(dl, cx, y + dy, cx, y + math.min(dy + 2, h), PAL.wave_dim)
           end
         end
       end
       local nsegs = #cuts - 1
-      imgui.DrawList_AddText(dl, x + w - 48, y + 2, PAL.wave2, ('%d 段'):format(nsegs))
+      imgui.DrawList_AddText(dl, x + w - 48, y + 2, PAL.wave_dim, ('%d 段'):format(nsegs))
     end
   end
 
@@ -1562,6 +1632,7 @@ local function preview_kind(e)
     if e.is_midi then return 'piano' end
     -- 惰性补齐/修复媒体信息: 兼容旧持久化条目(无 fclass/file 字段) 与新捕获条目
     repair_entry(e)
+    if e.fclass == 'midi' or e.fclass == 'proj' or e.fclass == 'empty' then return 'info' end
     if e.fclass == 'video' or e.fclass == 'image' then return 'thumb' end
     -- 有源音频文件或已知音频时长 → 波形; 否则(空 take/无媒体源) → 信息块
     if (e.file and e.file ~= '' and e.fclass == 'audio') or (e.src_len and e.src_len > 0) then
@@ -1628,16 +1699,19 @@ local function draw_info_block(e, x, y, w, h)
   imgui.DrawList_AddRect(dl, x, y, x + w, y + h, PAL.grid, 4)
 end
 
--- 圆角类型徽章: 彩色底 + 深色文字, 居中、微边框
-local function draw_badge_at(label, color)
+-- 类型徽章: 半透明色底 + 同色文字 (低饱和, MiniMeters 式), 固定高度,
+-- 可传 y_abs 让调用方做像素级垂直对齐
+local BADGE_H = 18
+local function draw_badge_at(label, color, y_abs)
   local tw, th = imgui.CalcTextSize(ctx, label)
-  local bw, bh = tw + 12, th + 5
+  local bw, bh = tw + 12, BADGE_H
   local bx, by = imgui.GetCursorScreenPos(ctx)
+  if y_abs then by = y_abs end
   imgui.Dummy(ctx, bw, bh)
   local dl = imgui.GetWindowDrawList(ctx)
-  imgui.DrawList_AddRectFilled(dl, bx, by, bx + bw, by + bh, color, 4)
-  imgui.DrawList_AddRect(dl, bx, by, bx + bw, by + bh, PAL.border_h, 4)
-  imgui.DrawList_AddText(dl, bx + 6, by + (bh - th) / 2, PAL.ink, label)
+  imgui.DrawList_AddRectFilled(dl, bx, by, bx + bw, by + bh, with_alpha(color, 0x2A), 4)
+  imgui.DrawList_AddRect(dl, bx, by, bx + bw, by + bh, with_alpha(color, 0x44), 4)
+  imgui.DrawList_AddText(dl, bx + 6, by + (bh - th) / 2, color, label)
   return bw, bh
 end
 
@@ -1657,11 +1731,14 @@ local function match_kind(e, f)
   if f == 'audio' then
     return e.kind == 'item' and not e.is_midi
        and e.fclass ~= 'video' and e.fclass ~= 'image'
+       and e.fclass ~= 'midi' and e.fclass ~= 'proj' and e.fclass ~= 'empty'
   end
   if f == 'visual' then
     return e.kind == 'item' and (e.fclass == 'video' or e.fclass == 'image')
   end
-  if f == 'midi' then return e.kind == 'notes' or (e.kind == 'item' and e.is_midi) end
+  if f == 'midi' then
+    return e.kind == 'notes' or (e.kind == 'item' and (e.is_midi or e.fclass == 'midi'))
+  end
   return e.kind == f
 end
 
@@ -1694,23 +1771,31 @@ local function card_body(e, compact)
   local pk = preview_kind(e)
   local prev_h = preview_height(e, pk, compact)
 
-  -- ---- 头部行: 类型徽章 + 标题(像素截断) + 相对时间(右对齐) ----
+  -- ---- 头部行: 徽章(固定高) + 标题 + 时间, 全部画在同一条垂直中线上 ----
   local badge_kind = e.kind
   if e.kind == 'item' then
     if e.fclass == 'video' then badge_kind = 'video'
     elseif e.fclass == 'image' then badge_kind = 'image'
+    elseif e.fclass == 'midi' then badge_kind = 'midi'
+    elseif e.fclass == 'proj' then badge_kind = 'proj'
+    elseif e.fclass == 'empty' then badge_kind = 'empty'
     else badge_kind = 'item' end
   end
   local blabel = KIND_LABEL[badge_kind] or tostring(badge_kind)
-  local bw, bh = draw_badge_at(blabel, KIND_COLOR[badge_kind] or PAL.accent)
-  imgui.SameLine(ctx, 0, 8)
-  imgui.AlignTextToFramePadding(ctx)
+  local bcol = KIND_COLOR[badge_kind] or PAL.accent
+  local HEAD_H = BADGE_H + 4
   local ago_txt = ago(e.time)
   local tw_ago = select(1, imgui.CalcTextSize(ctx, ago_txt))
-  imgui.Text(ctx, fit_text(e.title or '', w - bw - 8 - tw_ago - 16))
-  imgui.SameLine(ctx)
-  imgui.SetCursorPosX(ctx, math.max(w - tw_ago - 2, bw + 8))
-  imgui.TextDisabled(ctx, ago_txt)
+  local bx, by = imgui.GetCursorScreenPos(ctx)
+  local bw = select(1, draw_badge_at(blabel, bcol, by + (HEAD_H - BADGE_H) / 2))
+  local dl_h = imgui.GetWindowDrawList(ctx)
+  local title_txt = e.title or ''
+  local title_max = math.max(w - bw - 8 - tw_ago - 12, 24)
+  local _, th_t = imgui.CalcTextSize(ctx, title_txt)
+  local ty = by + (HEAD_H - th_t) / 2
+  imgui.DrawList_AddText(dl_h, bx + bw + 8, ty, PAL.txt, fit_text(title_txt, title_max))
+  imgui.DrawList_AddText(dl_h, bx + w - tw_ago, ty, T.text_dis, ago_txt)
+  imgui.Dummy(ctx, w, HEAD_H)
 
   -- ---- 预览区 ----
   local px, py = imgui.GetCursorScreenPos(ctx)
@@ -1835,6 +1920,10 @@ local function card_body(e, compact)
       if e.len then meta[#meta+1] = fmt_t(e.len) .. 's' end
       if e.sr and e.sr > 0 then meta[#meta+1] = ('%d Hz'):format(e.sr) end
       if e.nch and e.nch > 0 then meta[#meta+1] = e.nch .. 'ch' end
+      if e.stype == 'SECTION' then meta[#meta+1] = '片段源'
+      elseif e.stype == 'REVERSE' then meta[#meta+1] = '反向'
+      elseif e.stype == 'MIDI' then meta[#meta+1] = 'MIDI 源'
+      elseif e.stype == 'SUBPROJECT' or e.stype == 'PROJREF' then meta[#meta+1] = '工程引用' end
       if e.vol and e.vol ~= 1 then meta[#meta+1] = ('%.1f dB'):format(20 * math.log(math.max(e.vol, 0.0001), 10)) end
       if e.pitch and e.pitch ~= 0 then
         -- D_PITCH 可能是小数 (如 -0.5), %d 会抛 "number has no integer representation"
