@@ -15,7 +15,7 @@
 
 | 分类 | 内容 |
 | --- | --- |
-| BST Sound Tools | 声音设计工具箱、搜索面板、零交叉裁剪循环、**循环生成器 (Loopmaker)**、**自动多普勒 (Auto Doppler + 配套 JSFX)**、变奏工作台、渲染块、批量渲染、归一化、take 重命名等 13 个文件(含共享库 `bst_lib.lua` / `bst_fluent.lua` 与 `Effects/bst/bst_Doppler.jsfx`) |
+| BST Sound Tools | 声音设计工具箱、搜索面板、零交叉裁剪循环、**循环生成器 (Loopmaker)**、**自动多普勒 (Auto Doppler + 配套 JSFX)**、变奏工作台、渲染块、批量渲染、归一化、take 重命名,以及 12 个快捷键动作 (take 切换/试听导航/移轨/峰值吸附/随机摆位/轻中重快速变奏) 共 25 个文件(含共享库 `bst_lib.lua` / `bst_fluent.lua` 与 `Effects/bst/bst_Doppler.jsfx`) |
 | BST Clipboard | 剪贴板管理器:捕获 item/轨道/标记/包络/MIDI → 波形预览选区切片 → 拖出粘贴,共 11 个文件 |
 
 ### 循环生成器 bst: Loopmaker

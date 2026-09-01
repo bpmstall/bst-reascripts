@@ -108,6 +108,66 @@
       </version>
     </reapack>
   </category>
+    <reapack name="bst Snap Offset at Peak.lua" type="script" desc="把选中 item 吸附偏移设到 RMS 峰值时刻 (对齐/多普勒参考)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Snap Offset at Peak.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Snap%20Offset%20at%20Peak.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Take Next.lua" type="script" desc="选中 item 切到下一个 take (循环)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Take Next.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Take%20Next.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Take Prev.lua" type="script" desc="选中 item 切到上一个 take (循环)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Take Prev.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Take%20Prev.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Take Random.lua" type="script" desc="选中 item 随机切换 take (不重复当前)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Take Random.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Take%20Random.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Play Next Item.lua" type="script" desc="试听导航: 跳到下一个 item 开头播放">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Play Next Item.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Play%20Next%20Item.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Play Prev Item.lua" type="script" desc="试听导航: 跳到上一个 item 开头播放">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Play Prev Item.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Play%20Prev%20Item.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Move Items Up.lua" type="script" desc="选中 item 整体移到上一条轨道 (保持位置)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Move Items Up.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Move%20Items%20Up.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Move Items Down.lua" type="script" desc="选中 item 整体移到下一条轨道 (保持位置)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Move Items Down.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Move%20Items%20Down.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Randomize Positions.lua" type="script" desc="时选内随机摆位 (脚步/Foley 铺位去机械感)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Randomize Positions.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Randomize%20Positions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Variations Light.lua" type="script" desc="快速变奏·轻 (1 变奏 ±0.5st/±0.5dB)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Variations Light.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Light.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Variations Medium.lua" type="script" desc="快速变奏·中 (2 变奏 ±2st/±1.5dB+随机淡化)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Variations Medium.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Medium.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Variations Heavy.lua" type="script" desc="快速变奏·重 (4 变奏 ±6st/±3dB+随机淡化)">
+      <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
+        <source main="main" file="bst/bst Variations Heavy.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Variations%20Heavy.lua</source>
+      </version>
+    </reapack>
   <category name="BST Clipboard">
     <reapack name="bst Capture Envelope.lua" type="script" desc="捕获选中包络到剪贴板历史">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
