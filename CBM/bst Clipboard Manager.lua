@@ -284,8 +284,8 @@ local PAL = {
   -- 主强调色
   accent  = T.accent,
   accent_d= with_alpha(T.accent, 0x90),
-  wave_peak = 0x4CC2FF30,  -- 波形峰值剪影 (accent 低透明填充)
-  wave_rms  = 0x74D2FFC8,  -- 波形 RMS 内芯 (同色系提亮)
+  wave_peak = 0x4CC2FF5E,  -- 波形峰值剪影 (accent 半透明填充)
+  wave_rms  = 0x93DCFFEE,  -- 波形 RMS 内芯 (同色系高亮)
   wave      = 0x74D2FFD8,  -- 主波色 (MIDI 音符/包络线共用)
   wave2     = 0x5E7A8CB4,  -- 次级元素 (未选中音符): 灰蓝, 去紫
   wave_dim  = 0x74D2FF80,  -- 切片虚线等次级提示
@@ -308,7 +308,8 @@ local PAL = {
 }
 
 local KIND_LABEL = { item='音频', video='视频', image='图片', midi='MIDI', proj='工程',
-                     empty='空', notes='MIDI', track='轨道', marker='标记', envelope='包络' }
+                     empty='空', notes='MIDI', track='轨道', marker='标记', envelope='包络',
+                     fxchain='FX链' }
 -- 类型徽章分类色 (图表配色扩展, 基于 Fluent accent/warn/ok 系)
 local KIND_COLOR = {
   item     = 0x4CC2FFFF,  -- 蓝 (音频)
@@ -321,6 +322,7 @@ local KIND_COLOR = {
   track    = 0x76D7ADFF,  -- 薄荷 (轨道)
   marker   = T.warn,      -- 黄 (标记)
   envelope = 0xFFB36BFF,  -- 橙 (包络)
+  fxchain  = 0xB9A0FBFF,  -- 紫灰 (FX 链)
 }
 
 -- ============================ 状态 & 持久化 ============================
@@ -366,8 +368,16 @@ end
 
 local function entry_key(e)
   -- 内容指纹: 同一对象重复复制/捕获时用于去重
+  -- chunk 类条目直接哈希整块 (FX 链/轨道/包络), 其余按内容字段
+  if e.chunk and (e.kind == 'fxchain' or e.kind == 'track' or e.kind == 'envelope') then
+    return e.kind .. '|' .. hash(e.chunk)
+  end
+  local extra = ''
+  if e.kind == 'marker' then extra = #e.marks .. '|' .. (e.marks[1] and e.marks[1].pos or '')
+  elseif e.kind == 'envelope' then extra = #e.points .. '|' .. (e.points[1] and e.points[1].t or '')
+  elseif e.kind == 'notes' then extra = e.nnotes or #e.notes or 0 end
   return table.concat({ e.kind or '', e.file or e.title or '', e.stype or '',
-                        e.soffs or '', e.len or '', e.pitch or '' }, '|')
+                        e.soffs or '', e.len or '', e.pitch or '', extra }, '|')
 end
 
 local function add_entry(e)
@@ -431,7 +441,7 @@ local function entry_load()
   local dropped = 0
   for _, e in ipairs(t.entries or {}) do
     if e.kind == 'item' or e.kind == 'track' or e.kind == 'marker'
-       or e.kind == 'notes' or e.kind == 'envelope' then
+       or e.kind == 'notes' or e.kind == 'envelope' or e.kind == 'fxchain' then
       -- 旧版本/外部数据防御: 补齐缺字段, 避免渲染/粘贴期 nil 拼接或格式化报错
       if e.kind == 'track' and type(e.d) == 'table' then
         e.d.name = tostring(e.d.name or '')
@@ -870,6 +880,15 @@ local function compute_cuts(e, pv, mode)
   return nil
 end
 
+local function track_display_name(track)
+  local _, nm = pc(r.GetSetMediaTrackInfo_String, track, 'P_NAME', '', false)
+  if not nm or nm == '' then
+    local num = pc(r.CSurf_TrackToID, track, false)
+    nm = 'Track ' .. tostring(num or 1)
+  end
+  return nm
+end
+
 local function insert_item_chunk(track, chunk, pos, len, soffs)
   local it = r.AddMediaItemToTrack(track)
   if not it then return nil end
@@ -901,6 +920,22 @@ local function paste_entry(e, pos, track, slice_mode)
     local rate = e.rate or 1
     -- 视频/图片不切片 (瞬态检测对视频源无意义, 且可能返回空导致误判)
     local is_media = (e.fclass == 'video' or e.fclass == 'image')
+    if not e.chunk and e.file then
+      -- 无 chunk 条目 (媒体浏览器路径捕获): 直接用源文件建 item
+      local src = pc(r.PCM_Source_CreateFromFile, e.file)
+      if not src then
+        msg = '源文件打开失败'
+      else
+        local len = (b - a) / rate
+        local it = r.AddMediaItemToTrack(track)
+        local tk = r.AddTakeToMediaItem(it)
+        r.SetMediaItemTake_Source(tk, src)
+        r.SetMediaItemInfo_Value(it, 'D_POSITION', pos)
+        r.SetMediaItemInfo_Value(it, 'D_LENGTH', math.max(len, 0.001))
+        if a > 0 then r.SetMediaItemTakeInfo_Value(tk, 'D_STARTOFFS', a * rate) end
+        msg = ('已插入 item (%s)'):format(fmt_t(len))
+      end
+    else
     local cuts = (not e.is_midi and not is_media) and compute_cuts(e, pv, slice_mode) or nil
     if cuts and #cuts >= 2 then
       for i = 1, #cuts - 1 do
@@ -914,6 +949,7 @@ local function paste_entry(e, pos, track, slice_mode)
       local len = (b - a) / rate
       local it = insert_item_chunk(track, e.chunk, pos, len, a)
       if it then msg = ('已插入 item (%s)'):format(fmt_t(len)) else msg = '插入失败' end
+    end
     end
 
   elseif kind == 'notes' then
@@ -958,6 +994,20 @@ local function paste_entry(e, pos, track, slice_mode)
       r.AddProjectMarker2(0, m.isrgn == 1, pos + rel, re_, m.name, -1, m.color)
     end
     msg = ('已插入 %d 个标记/区域'):format(#e.marks)
+
+  elseif kind == 'fxchain' then
+    local fxn = (e.d and e.d.fx) or {}
+    if #fxn == 0 then
+      msg = 'FX 链为空'
+    else
+      local okn = 0
+      for _, fx in ipairs(fxn) do
+        local p = r.TrackFX_AddByName(track, fx.name, false, -1)
+        if p and p >= 0 then okn = okn + 1 end
+      end
+      msg = ('已挂载 %d/%d 个 FX 到 %s'):format(okn, #fxn, track_display_name(track))
+      if okn == 0 then msg = '全部 FX 未能按名挂载 (可尝试拖入 REAPER 原生粘贴)' end
+    end
 
   elseif kind == 'envelope' then
     local env = pc(r.GetTrackEnvelopeByName, track, e.env_name)
@@ -1112,6 +1162,50 @@ local function entry_from_track_chunk(chunk)
   return e
 end
 
+-- 从 <FXCHAIN chunk 反解析 FX 链条目 (跨窗口复制: FX 浏览器/轨道 FX 链 Ctrl+C)
+local function entry_from_fxchain_chunk(chunk)
+  local fxn = {}
+  for ln in chunk:gmatch('[^\r\n]+') do
+    local ty = ln:match('^<VST%d*%s') or ln:match('^<AUv3%d*%s') or ln:match('^<AU%d*%s')
+            or ln:match('^<CLAP%s') or ln:match('^<JS%s') or ln:match('^<DX%s')
+    if ty then
+      local nm = ln:match('"([^"]*)"') or ''
+      if ty == 'JS' then nm = basename(nm):gsub('%.%w+$', '') end
+      fxn[#fxn+1] = { name = (nm ~= '' and nm) or ty, preset = '', on = true }
+    end
+  end
+  local first = fxn[1] and fxn[1].name or ''
+  local e = { kind = 'fxchain', chunk = chunk,
+              d = { name = '', color = 0, fx = fxn, sends = 0, recvs = 0, vol = 1, pan = 0 } }
+  e.title = (first ~= '' and (first .. ((#fxn > 1) and ('  +' .. (#fxn - 1)) or ''))
+             or '空 FX 链'):sub(1, 48)
+  return e
+end
+
+-- 从 <PARMENV(EX) chunk 反解析包络条目 (轨道包络 Ctrl+C)
+local function entry_from_parenv_chunk(chunk)
+  local pts = {}
+  for pt, val in chunk:gmatch('<PT%s+([%d%.%-]+)%s+([%d%.%-]+)') do
+    pts[#pts+1] = { t = tonumber(pt) or 0, v = tonumber(val) or 0 }
+  end
+  local e = { kind = 'envelope', chunk = chunk, points = pts, env_name = '复制的包络' }
+  e.title = ('复制的包络 · %d 点'):format(#pts)
+  return e
+end
+
+-- 从媒体文件路径文本构建条目 (媒体浏览器 "复制文件路径" / 资源管理器)
+local function entry_from_file_path(path)
+  local e = { kind = 'item', file = path, rate = 1, soffs = 0, stype = 'FILEPATH' }
+  e.fclass = class_of(ext_of(path))
+  e.fsize = file_size(path)
+  e.take_name = basename(path)
+  e.title = basename(path):sub(1, 48)
+  finalize_item_meta(e)
+  e.len = e.src_len or 0
+  e.win = { a = 0, b = e.src_len or e.len or 1 }
+  return e
+end
+
 -- 轮询系统剪贴板: 内容变化且为 REAPER 对象时捕获
 local function watch_clipboard()
   if os.clock() - (S.last_clip_poll or 0) < 1.0 then return end
@@ -1122,17 +1216,18 @@ local function watch_clipboard()
   if key == S.last_clip_key then return end
   S.last_clip_key = key
 
-  -- 按外层类型判断: 轨道 chunk 内嵌 <ITEM, 故比较二者首次出现位置
+  -- 按外层类型判断: 轨道 chunk 内嵌 <ITEM/<FXCHAIN, 故比较首次出现位置
   local it_pos = big:find('<ITEM', 1, true)
   local tr_pos = big:find('<TRACK', 1, true)
+  local fx_pos = big:find('<FXCHAIN', 1, true)
+  local env_pos = big:find('<PARMENV', 1, true)
 
-  if it_pos or tr_pos then
-    if tr_pos and (not it_pos or tr_pos < it_pos) then
+  if tr_pos and (not it_pos or tr_pos < it_pos) then
       -- 轨道 (可能含多条轨道, 取首个 chunk 作为代表条目)
       local name = big:match('\nNAME "([^"]*)"') or '轨道'
       add_entry(entry_from_track_chunk(big))
       log('[CBM] 检测到复制轨道 "' .. name .. '", 已捕获\n')
-    else
+  elseif it_pos then
       local n_items = select(2, big:gsub('<ITEM', ''))
       if n_items == 1 then
         local e = entry_from_item_chunk(big)
@@ -1173,13 +1268,40 @@ local function watch_clipboard()
         end
         log(('[CBM] 检测到复制 %d 个 item, 已捕获\n'):format(count))
       end
+  elseif fx_pos and (not env_pos or fx_pos <= env_pos) then
+    -- FX 链复制 (轨道 FX 链 / FX 浏览器 Ctrl+C)
+    local e = entry_from_fxchain_chunk(big)
+    e.key = entry_key(e)
+    if not key_exists(e.key) then
+      add_entry(e)
+      log(('[CBM] 检测到复制 FX 链 (%d 个 FX), 已捕获\n'):format(#(e.d.fx)))
+    end
+  elseif env_pos then
+    -- 轨道包络复制
+    local e = entry_from_parenv_chunk(big)
+    e.key = entry_key(e)
+    if not key_exists(e.key) then
+      add_entry(e)
+      log(('[CBM] 检测到复制包络 (%d 点), 已捕获\n'):format(#e.points))
     end
   else
+    -- 纯文本: 媒体浏览器/资源管理器复制的媒体文件路径 → 直接成条目
+    local path = big:match('^%s*([%a]:[\\/][^\r\n]+)') or big:match('^%s*(\\\\[^\r\n]+)')
+    path = path and path:gsub('%s+$', '')
+    if path and file_exists(path) and class_of(ext_of(path)) then
+      local e = entry_from_file_path(path)
+      e.key = entry_key(e)
+      if not key_exists(e.key) then
+        add_entry(e)
+        log('[CBM] 检测到媒体文件路径, 已捕获: ' .. path .. '\n')
+      end
+    else
     -- 剪贴板变化但非 REAPER 对象: 忽略; 首次打印摘要便于排查
     if not S.clip_diag_shown then
       S.clip_diag_shown = true
       local head = big:sub(1, 100):gsub('[\r\n]', ' ')
       log(('[CBM] 剪贴板变化但非 REAPER 对象 (len=%d): "%s"\n'):format(#big, head))
+    end
     end
   end
 end
@@ -1394,15 +1516,15 @@ local function draw_waveform(e, x, y, w, h)
         local base = (si - 1) * nch + ci + 1
         local mx = math.max(pk.t[base] or 0, 0)
         local mn = math.max(-(pk.t[n * nch + base] or 0), 0)
-        local y1 = cy - mx / vpeak * (hh / 2) * 0.92
-        local y2 = cy + mn / vpeak * (hh / 2) * 0.92
+        local y1 = cy - mx / vpeak * (hh / 2) * 0.96
+        local y2 = cy + mn / vpeak * (hh / 2) * 0.96
         if y2 - y1 < 1 then y2 = y1 + 1 end
         imgui.DrawList_AddRectFilled(dl, x + sx, y1, x + sx + 1, y2, PAL.wave_peak)
         if rn > 0 then
           local rmx = math.max(pk.rt[base] or 0, 0)
           local rmn = math.max(-(pk.rt[rn * nch + base] or 0), 0)
-          local ry1 = cy - rmx / vpeak * (hh / 2) * 0.92
-          local ry2 = cy + rmn / vpeak * (hh / 2) * 0.92
+          local ry1 = cy - rmx / vpeak * (hh / 2) * 0.96
+          local ry2 = cy + rmn / vpeak * (hh / 2) * 0.96
           if ry2 - ry1 < 1 then ry2 = ry1 + 1 end
           imgui.DrawList_AddRectFilled(dl, x + sx, ry1, x + sx + 1, ry2, PAL.wave_rms)
         end
@@ -1413,6 +1535,12 @@ local function draw_waveform(e, x, y, w, h)
   if nch >= 2 then
     draw_ch(0, y, half)
     draw_ch(1, y + half, half)
+    -- 声道分隔 + 角标: 同色系下明确 "这是双声道"
+    imgui.DrawList_AddLine(dl, x, y + half, x + w, y + half, PAL.grid)
+    if w >= 90 and h >= 44 then
+      imgui.DrawList_AddText(dl, x + 4, y + 1, PAL.txt3, 'L')
+      imgui.DrawList_AddText(dl, x + 4, y + half + 1, PAL.txt3, 'R')
+    end
   else
     draw_ch(0, y, h)
   end
@@ -1643,6 +1771,7 @@ local function preview_kind(e)
   elseif e.kind == 'envelope' then return 'env'
   elseif e.kind == 'marker' then return 'marker'
   elseif e.kind == 'track' then return 'track'
+  elseif e.kind == 'fxchain' then return 'track'
   end
   return 'info'
 end
@@ -1701,7 +1830,7 @@ end
 
 -- 类型徽章: 半透明色底 + 同色文字 (低饱和, MiniMeters 式), 固定高度,
 -- 可传 y_abs 让调用方做像素级垂直对齐
-local BADGE_H = 18
+local BADGE_H = 16
 local function draw_badge_at(label, color, y_abs)
   local tw, th = imgui.CalcTextSize(ctx, label)
   local bw, bh = tw + 12, BADGE_H
@@ -1722,6 +1851,7 @@ local KIND_CHIPS = {
   { id = 'visual',   label = '视图' },
   { id = 'midi',     label = 'MIDI' },
   { id = 'track',    label = '轨道' },
+  { id = 'fxchain',  label = 'FX链' },
   { id = 'marker',   label = '标记' },
   { id = 'envelope', label = '包络' },
 }
@@ -1783,7 +1913,7 @@ local function card_body(e, compact)
   end
   local blabel = KIND_LABEL[badge_kind] or tostring(badge_kind)
   local bcol = KIND_COLOR[badge_kind] or PAL.accent
-  local HEAD_H = BADGE_H + 4
+  local HEAD_H = BADGE_H + 2
   local ago_txt = ago(e.time)
   local tw_ago = select(1, imgui.CalcTextSize(ctx, ago_txt))
   local bx, by = imgui.GetCursorScreenPos(ctx)
@@ -1835,9 +1965,14 @@ local function card_body(e, compact)
     local d = e.d or {}
     imgui.DrawList_AddRectFilled(dl, px + 8, py + 8, px + 20, py + 20,
       d.color ~= 0 and ((d.color & 0xFFFFFF) | 0xFF000000) or PAL.txt2, 3)
-    imgui.DrawList_AddText(dl, px + 28, py + 8, PAL.txt,
-      ('%s  vol %.1f dB  pan %+.0f'):format(fit_text(d.name ~= '' and d.name or '(未命名)', w - 140),
-        20 * math.log(math.max(d.vol or 1, 0.0001), 10), (d.pan or 0) * 100))
+    if e.kind == 'fxchain' then
+      imgui.DrawList_AddText(dl, px + 28, py + 8, PAL.txt,
+        ('FX 链 · %d 个效果器'):format(#(d.fx or {})))
+    else
+      imgui.DrawList_AddText(dl, px + 28, py + 8, PAL.txt,
+        ('%s  vol %.1f dB  pan %+.0f'):format(fit_text(d.name ~= '' and d.name or '(未命名)', w - 140),
+          20 * math.log(math.max(d.vol or 1, 0.0001), 10), (d.pan or 0) * 100))
+    end
     local yy = py + 28
     local fxn = d.fx or {}
     for i = 1, math.min(#fxn, compact and 1 or 3) do
