@@ -258,11 +258,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 480, 460, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Folder Items (nvk_FOLDER_ITEMS 式折叠管理)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Folder Items', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
-      ImGui.Text(ctx, "Folder Item 容器控制")
+      ImGui.Text(ctx, "Folder Items Container")
       ImGui.TextDisabled(ctx, "在父级折叠轨生成总控 Item，移动/缩放/重命名时子轨素材同步。")
         fl.end_card(ctx)
       end
@@ -272,16 +272,16 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Options
-    ImGui.Text(ctx, "生成与联动选项:")
+    ImGui.Text(ctx, "Options")
     ImGui.SetNextItemWidth(ctx, 130)
-    local pd_c, new_pd = ImGui.DragDouble(ctx, "左右余量 (Padding ms)", st.pad_ms, 5, 0, 1000, "%.0f ms")
+    local pd_c, new_pd = ImGui.DragDouble(ctx, "Padding (ms)", st.pad_ms, 5, 0, 1000, "%.0f ms")
     if pd_c then st.pad_ms = new_pd end
 
-    local cs_c, new_cs = ImGui.Checkbox(ctx, "跟随父轨道颜色 (Color Sync)", st.color_sync)
+    local cs_c, new_cs = ImGui.Checkbox(ctx, "Sync folder track color", st.color_sync)
     if cs_c then st.color_sync = new_cs end
 
     ImGui.SameLine(ctx)
-    local ag_c, new_ag = ImGui.Checkbox(ctx, "生成后自动群组绑定 (Auto Group)", st.auto_group)
+    local ag_c, new_ag = ImGui.Checkbox(ctx, "Auto group with children", st.auto_group)
     if ag_c then st.auto_group = new_ag end
 
     ImGui.Spacing(ctx)
@@ -295,13 +295,13 @@ local function loop()
       end
 
     ImGui.Spacing(ctx)
-    if fl.button(ctx, "🏷️ 从选中的 Folder Item 级联重命名子轨素材", { width = -1, height = 30 }) then
+    if fl.button(ctx, "Cascade rename children", { width = -1, height = 30 }) then
       cascade_names_from_folder_items()
       save_state()
     end
 
     ImGui.Spacing(ctx)
-    if fl.button(ctx, "🔗 选中 Folder Item 下对应的全部子轨素材", { width = -1, height = 30 }) then
+    if fl.button(ctx, "Select children items", { width = -1, height = 30 }) then
       select_children_of_folder_items()
     end
 

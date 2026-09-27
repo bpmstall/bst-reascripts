@@ -1,7 +1,13 @@
 # bst: Wwise Pipeline — Wwise WAAPI 自动化导入
 
-> **对标**: `Audiokinetic WAAPI Pipeline`
+> **对标**: `Audiokinetic WAAPI Pipeline`  
 > **定位**: 选中 REAPER 资产一键直通 Wwise 生成层级容器与 Play Event
+
+---
+
+## 面板预览
+
+![bst Wwise Pipeline](../img/wwise_pipeline.png)
 
 ---
 
@@ -11,10 +17,18 @@
 
 ---
 
-## 2. 功能详解
+## 2. 参数与控件说明
 
-- **Actor-Mixer 路径**: 可自由指定挂载到的 Wwise 目标 Work Unit 与父容器层级。
-- **容器包装类型**:
+- **Actor-Mixer Path**: 指定挂载到的 Wwise 目标 Work Unit 与父容器层级路径。
+- **Container Type**:
   - `Random Container`: 自动将选中的多个变奏打包为随机容器（适合脚步、受击、射击）。
   - `Blend Container`: 自动将多层声音组合为混合容器（适合技能分层复合音）。
-- **Event 生成器**: 勾选后自动为容器在 `Events` 层级下生成同名 Play Event。
+  - `Sequence Container`: 序列容器。
+- **Generate Play Event**: 勾选后自动为容器在 `Events` 层级下生成同名 Play Event。
+- **Event path**: Play Event 放置的目标路径。
+
+---
+
+## 3. 操作按钮
+
+- **Export Wwise import list**: 一键生成 Wwise 导入清单与容器定义文件。

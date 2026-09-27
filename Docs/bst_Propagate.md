@@ -1,7 +1,13 @@
-# bst: Propagate — 变奏属性传播同步
+# bst: Propagate — 变奏属性广播同步
 
-> **对标**: `nvk_PROPAGATE`
+> **对标**: `nvk_PROPAGATE`  
 > **定位**: 将基准母版的修剪、淡变、音量、音高与色彩一键同步至批处理目标
+
+---
+
+## 面板预览
+
+![bst Propagate](../img/propagate.png)
 
 ---
 
@@ -11,11 +17,17 @@
 
 ---
 
-## 2. 同步项勾选控制
+## 2. 属性项选择
 
-- **淡入淡出时长与曲线形状 (Fades & Curves)**: 严格复制 Fade In / Fade Out 长度及曲率（Shape 0~6）。
-- **条目与 Take 音量增益 (Volume dB)**: 同步条目增益与活动 Take 增益。
-- **声像分布 (Pan)**: 同步声像设置。
-- **音高与保持算法 (Pitch & Preserve)**: 同步半音偏移与保留音高开关。
-- **裁剪音效长度 (Item Length)**: 强制将目标条目裁剪为与母版一致的长度。
-- **自定义色彩标记 (Item Color)**: 同步视觉分组颜色。
+- **Fades & curves**: 严格复制 Fade In / Fade Out 长度及曲率（Shape 0~6）。
+- **Volume (Item & Take)**: 同步条目增益与活动 Take 增益。
+- **Pan**: 同步声像设置。
+- **Pitch & preserve algorithm**: 同步半音偏移与保留音高开关。
+- **Length**: 强制将目标条目裁剪为与母版一致的长度。
+- **Color**: 同步视觉分组颜色。
+
+---
+
+## 3. 操作按钮
+
+- **Propagate to targets**: 立即将母版属性广播同步到其余选中 Item。

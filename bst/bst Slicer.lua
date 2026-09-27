@@ -89,11 +89,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 480, 430, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Slicer (瞬态智能批量切片与去静音)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Slicer', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "intro_card", 75) then
-      ImGui.Text(ctx, "录音素材批量无破音切片与去静音")
+      ImGui.Text(ctx, "Dynamic Slicer & Silence Gate")
       ImGui.TextDisabled(ctx, "基于瞬态能量自动切割长条采样、去静音、自动定吸附点并加防爆音淡化。")
       fl.end_card(ctx)
     end
@@ -103,27 +103,27 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Sliders
-    ImGui.Text(ctx, "门限与切片参数:")
+    ImGui.Text(ctx, "Parameters")
     ImGui.SetNextItemWidth(ctx, 130)
-    local th_c, new_th = ImGui.SliderDouble(ctx, "瞬态门限 (Threshold dB)", st.thresh_db, -60.0, -12.0, "%.1f dB")
+    local th_c, new_th = ImGui.SliderDouble(ctx, "Threshold (dB)", st.thresh_db, -60.0, -12.0, "%.1f dB")
     if th_c then st.thresh_db = new_th end
 
     ImGui.SetNextItemWidth(ctx, 130)
-    local ml_c, new_ml = ImGui.SliderDouble(ctx, "最短事件 (Min len ms)", st.min_len_ms, 20.0, 500.0, "%.0f ms")
+    local ml_c, new_ml = ImGui.SliderDouble(ctx, "Min length (ms)", st.min_len_ms, 20.0, 500.0, "%.0f ms")
     if ml_c then st.min_len_ms = new_ml end
 
     ImGui.SetNextItemWidth(ctx, 130)
-    local pd_c, new_pd = ImGui.SliderDouble(ctx, "前置余量 (Padding ms)", st.pad_ms, 0.0, 50.0, "%.0f ms")
+    local pd_c, new_pd = ImGui.SliderDouble(ctx, "Padding (ms)", st.pad_ms, 0.0, 50.0, "%.0f ms")
     if pd_c then st.pad_ms = new_pd end
 
-    local af_c, new_af = ImGui.Checkbox(ctx, "自动添加微淡入淡出防爆音 (Auto Anti-Click Fades)", st.auto_fade)
+    local af_c, new_af = ImGui.Checkbox(ctx, "Anti-click micro fades", st.auto_fade)
     if af_c then st.auto_fade = new_af end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button(ctx, "✂️ 执行智能批量切片 (Dynamic Slice)", { accent = true, width = -1, height = 38 }) then
+    if fl.button(ctx, "Dynamic slice", { accent = true, width = -1, height = 38 }) then
       slice_selected_items()
       save_state()
     end

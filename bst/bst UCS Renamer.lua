@@ -106,11 +106,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 480, 490, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst UCS Renamer (工业级音效分类命名)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst UCS Renamer', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
-      ImGui.Text(ctx, "Universal Category System (UCS 8.2) 行业标准命名")
+      ImGui.Text(ctx, "Universal Category System (UCS 8.2)")
       ImGui.TextDisabled(ctx, "按全球游戏与影视音效规范自动组装 CatID_Description_Index 命名。")
         fl.end_card(ctx)
       end
@@ -120,7 +120,7 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Category selector
-    ImGui.Text(ctx, "音效主大类 (UCS Category ID):")
+    ImGui.Text(ctx, "Category ID:")
     ImGui.SetNextItemWidth(ctx, -1)
     local cur_name = UCS_CATEGORIES[st.cat_idx] and UCS_CATEGORIES[st.cat_idx].name or "选择类别"
     if ImGui.BeginCombo(ctx, "##cat_combo", cur_name) then
@@ -136,20 +136,20 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Description & Creator
-    ImGui.Text(ctx, "子类与描述 (SubCategory / Sound Name):")
+    ImGui.Text(ctx, "SubCategory / Sound Name:")
     ImGui.SetNextItemWidth(ctx, -1)
     local sn_c, new_sn = ImGui.InputText(ctx, "##sub_input", st.sub_name)
     if sn_c then st.sub_name = new_sn end
 
     ImGui.Spacing(ctx)
-    ImGui.Text(ctx, "创作者/项目标签 (Creator / Vendor Tag):")
+    ImGui.Text(ctx, "Creator / Project Tag:")
     ImGui.SetNextItemWidth(ctx, 160)
     local ct_c, new_ct = ImGui.InputText(ctx, "##creator_input", st.creator_tag)
     if ct_c then st.creator_tag = new_ct end
 
     ImGui.SameLine(ctx)
     ImGui.SetNextItemWidth(ctx, 100)
-    local sn_num, new_num = ImGui.DragInt(ctx, "起始号##snum", st.start_num, 0.2, 0, 999)
+    local sn_num, new_num = ImGui.DragInt(ctx, "Start ###snum", st.start_num, 0.2, 0, 999)
     if sn_num then st.start_num = new_num end
 
     -- Preview naming template
@@ -162,7 +162,7 @@ local function loop()
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button(ctx, "🏷️ 批量应用 UCS 标准重命名 (Apply Rename)", { accent = true, width = -1, height = 38 }) then
+    if fl.button(ctx, "Apply UCS rename", { accent = true, width = -1, height = 38 }) then
         apply_ucs_rename()
         save_state()
       end

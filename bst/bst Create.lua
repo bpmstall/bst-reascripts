@@ -387,32 +387,32 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 580, 560, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Create (nvk_CREATE 式分层生成)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Create', true)
 
   if visible then
     -- Header & Search Bar
-    ImGui.Text(ctx, "全局关键词 (Global Query):")
+    ImGui.Text(ctx, "Query")
     ImGui.SetNextItemWidth(ctx, -120)
     local q_changed, new_q = ImGui.InputText(ctx, "##main_q", st.main_query)
     if q_changed then st.main_query = new_q end
 
     ImGui.SameLine(ctx)
-    if ImGui.Button(ctx, "素材库设置", 110, 0) then
+    if ImGui.Button(ctx, "Library", 110, 0) then
       show_settings = not show_settings
     end
 
     -- Settings panel drawer
     if show_settings then
       if fl.begin_card and fl.begin_card(ctx, "settings_card", 130) then
-        ImGui.Text(ctx, "音效素材库目录 (支持多路径，分号或换行分隔):")
+        ImGui.Text(ctx, "Library directories (separated by semicolon):")
         local d_changed, new_d = ImGui.InputTextMultiline(ctx, "##dirs", st.lib_dirs, -1, 50)
         if d_changed then st.lib_dirs = new_d end
 
-        local p_changed, new_p = ImGui.Checkbox(ctx, "同时包含当前工程媒体目录", st.use_proj)
+        local p_changed, new_p = ImGui.Checkbox(ctx, "Include current project media directory", st.use_proj)
         if p_changed then st.use_proj = new_p end
 
         ImGui.SameLine(ctx)
-        if fl.button(ctx, "立即扫描素材库") then
+        if fl.button(ctx, "Scan library") then
           refresh_library()
         end
         ImGui.SameLine(ctx)
@@ -428,25 +428,25 @@ local function loop()
     -- Parameters
     ImGui.Text(ctx, "生成参数:")
     ImGui.SetNextItemWidth(ctx, 110)
-    local vc_changed, new_vc = ImGui.SliderInt(ctx, "变奏组数 (Variations)", st.var_count, 1, 10)
+    local vc_changed, new_vc = ImGui.SliderInt(ctx, "Variations", st.var_count, 1, 10)
     if vc_changed then st.var_count = new_vc end
 
     ImGui.SameLine(ctx)
     ImGui.SetNextItemWidth(ctx, 110)
-    local ml_changed, new_ml = ImGui.SliderDouble(ctx, "最长秒数 (Max s)", st.max_len_s, 0.2, 10.0, "%.1fs")
+    local ml_changed, new_ml = ImGui.SliderDouble(ctx, "Max length (s)", st.max_len_s, 0.2, 10.0, "%.1fs")
     if ml_changed then st.max_len_s = new_ml end
 
-    local ap_changed, new_ap = ImGui.Checkbox(ctx, "瞬态峰值吸附对齐 (Auto Transient Align)", st.align_peak)
+    local ap_changed, new_ap = ImGui.Checkbox(ctx, "Snap to transient peak", st.align_peak)
     if ap_changed then st.align_peak = new_ap end
 
     ImGui.SameLine(ctx)
-    local af_changed, new_af = ImGui.Checkbox(ctx, "微淡入淡出 (Auto Fade)", st.auto_fade)
+    local af_changed, new_af = ImGui.Checkbox(ctx, "Auto fade", st.auto_fade)
     if af_changed then st.auto_fade = new_af end
 
     ImGui.Spacing(ctx)
 
     -- Layers Card
-    ImGui.Text(ctx, "分层配置 (Layers):")
+    ImGui.Text(ctx, "Layers")
     if fl.begin_card and fl.begin_card(ctx, "layers_card", 160) then
       for i, l in ipairs(layers) do
         ImGui.PushID(ctx, i)
@@ -485,13 +485,13 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Action Buttons
-    if fl.button(ctx, string.format("✨ 一键生成 %d 组变奏 (Generate)", st.var_count), { accent = true, height = 36 }) then
+    if fl.button(ctx, string.format("Generate %d 组变奏 (Generate)", st.var_count), { accent = true, height = 36 }) then
       generate_variations()
       save_state()
     end
 
     ImGui.Spacing(ctx)
-    if fl.button(ctx, "🎲 选中项就地换选 (Re-roll Selected)", { width = -1, height = 28 }) then
+    if fl.button(ctx, "Re-roll selected", { width = -1, height = 28 }) then
       reroll_selected()
     end
 

@@ -130,11 +130,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 520, 520, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst GrimSync (游戏音频增量镜像同步)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst GrimSync', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "intro_card", 75) then
-      ImGui.Text(ctx, "REAPER ⇄ 游戏引擎 / Wwise 增量交付镜像")
+      ImGui.Text(ctx, "Game Engine & Middleware Sync")
       ImGui.TextDisabled(ctx, "自动比对渲染目录与引擎源目录，一键无感知增量更新覆盖。")
       fl.end_card(ctx)
     end
@@ -144,19 +144,19 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Directory inputs
-    ImGui.Text(ctx, "REAPER 渲染输出目录 (Source):")
+    ImGui.Text(ctx, "Source Directory (REAPER Render):")
     ImGui.SetNextItemWidth(ctx, -1)
     local s_c, new_s = ImGui.InputText(ctx, "##src_dir", st.src_dir)
     if s_c then st.src_dir = new_s end
 
     ImGui.Spacing(ctx)
-    ImGui.Text(ctx, "游戏引擎 / Wwise 音频目标目录 (Target):")
+    ImGui.Text(ctx, "Target Directory (Game Engine / Wwise):")
     ImGui.SetNextItemWidth(ctx, -1)
     local d_c, new_d = ImGui.InputText(ctx, "##dest_dir", st.dest_dir)
     if d_c then st.dest_dir = new_d end
 
     ImGui.Spacing(ctx)
-    local b_c, new_b = ImGui.Checkbox(ctx, "覆盖前备份已有旧音频 (Auto Backup)", st.auto_backup)
+    local b_c, new_b = ImGui.Checkbox(ctx, "Backup overwritten files", st.auto_backup)
     if b_c then st.auto_backup = new_b end
 
     ImGui.Spacing(ctx)
@@ -164,13 +164,13 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Actions
-    if fl.button(ctx, "🔍 比对源目录与目标工程差异 (Compare Diff)", { width = -1, height = 34 }) then
+    if fl.button(ctx, "Compare diff", { width = -1, height = 34 }) then
       compare_directories()
       save_state()
     end
 
     ImGui.Spacing(ctx)
-    if fl.button(ctx, "⚡ 一键增量同步到游戏工程 (Mirror & Sync)", { accent = true, width = -1, height = 38 }) then
+    if fl.button(ctx, "Mirror & Sync", { accent = true, width = -1, height = 38 }) then
       execute_sync()
       save_state()
     end

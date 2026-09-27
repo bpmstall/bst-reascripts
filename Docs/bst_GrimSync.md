@@ -1,7 +1,13 @@
 # bst: GrimSync — 游戏音频增量镜像同步
 
-> **对标**: `LKC GrimSync`
-> **定位**: 游戏音效资产从 REAPER 渲染目录向游戏引擎 / Wwise 目标目录无感知镜像同步
+> **对标**: `LKC GrimSync`  
+> **定位**: 游戏音效资产从 REAPER 渲染目录向游戏工程 / Wwise 目标目录无感知镜像同步
+
+---
+
+## 面板预览
+
+![bst GrimSync](../img/grimsync.png)
 
 ---
 
@@ -11,13 +17,15 @@
 
 ---
 
-## 2. 功能详解
+## 2. 参数与控件说明
 
-- **双向目录配置**:
-  - **Source**: REAPER 当前工程渲染输出目录（默认自动侦测工程名下 `Render/`）。
-  - **Target**: 游戏引擎工程或 Wwise Audio 导入目录。
-- **差异比对 (Compare Diff)**:
-  - 绿色高亮: 目标工程中尚不存在的全新资产。
-  - 蓝色高亮: 源目录已重新渲染、需要更新覆盖的已有资产。
-- **一键增量同步 (Mirror & Sync)**:
-  - 仅拷贝有变化的文件，跳过未修改文件，毫秒级完成。
+- **Source Directory (REAPER Render)**: REAPER 渲染输出源目录。
+- **Target Directory (Game Engine / Wwise)**: 游戏引擎或 Wwise 音频目标目录。
+- **Backup overwritten files**: 覆盖前自动备份已有旧音频文件。
+
+---
+
+## 3. 操作按钮
+
+- **Compare diff**: 极速比对两端目录，列出待新增（绿色）与待覆盖更新（蓝色）的音频资产。
+- **Mirror & Sync**: 仅增量拷贝有改动的文件，跳过未修改文件，毫秒级无感知同步交付。

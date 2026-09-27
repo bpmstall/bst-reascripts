@@ -220,7 +220,7 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 480, 490, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Subproject (nvk_SUBPROJECT 式工作流)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Subproject', true)
 
   if visible then
     local in_sub = is_current_subproject()
@@ -228,10 +228,10 @@ local function loop()
     -- Status card
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       if in_sub then
-        ImGui.TextColored(ctx, 0x6CCB5FFF, "当前正处于子工程 (Subproject) 标签页内")
+        ImGui.TextColored(ctx, 0x6CCB5FFF, "Active: Subproject Tab")
         ImGui.TextDisabled(ctx, "可直接点下方按钮一键对齐渲染标记并更新代理音频。")
       else
-        ImGui.Text(ctx, "当前处于主工程 (Main Project)")
+        ImGui.Text(ctx, "Active: Main Project")
         ImGui.TextDisabled(ctx, "选中要分层的 Items 或轨道，一键收纳进子工程。")
       end
         fl.end_card(ctx)
@@ -242,17 +242,17 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Subproject Bounds & Padding settings
-    ImGui.Text(ctx, "渲染边界标记 (=START / =END) 参数:")
+    ImGui.Text(ctx, "Render Bounds (=START / =END)")
     ImGui.SetNextItemWidth(ctx, 130)
-    local hp_c, new_hp = ImGui.SliderDouble(ctx, "前置余量 (Head s)", st.head_s, 0.0, 2.0, "%.2fs")
+    local hp_c, new_hp = ImGui.SliderDouble(ctx, "Head (s)", st.head_s, 0.0, 2.0, "%.2fs")
     if hp_c then st.head_s = new_hp end
 
     ImGui.SameLine(ctx)
     ImGui.SetNextItemWidth(ctx, 130)
-    local tp_c, new_tp = ImGui.SliderDouble(ctx, "尾音余量 (Tail s)", st.tail_s, 0.0, 5.0, "%.2fs")
+    local tp_c, new_tp = ImGui.SliderDouble(ctx, "Tail (s)", st.tail_s, 0.0, 5.0, "%.2fs")
     if tp_c then st.tail_s = new_tp end
 
-    local sp_c, new_sp = ImGui.Checkbox(ctx, "对齐标记后自动保存并渲染代理 (.rpp-prox)", st.save_prox)
+    local sp_c, new_sp = ImGui.Checkbox(ctx, "Auto-save & render RPP-PROX", st.save_prox)
     if sp_c then st.save_prox = new_sp end
 
     ImGui.Spacing(ctx)
@@ -260,7 +260,7 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Action 1: Marker alignment (Core nvk_SUBPROJECT feature)
-    if fl.button(ctx, "🎯 一键校准 =START / =END 标记 (根据未静音 Item)", { accent = true, width = -1, height = 36 }) then
+    if fl.button(ctx, "Sync markers", { accent = true, width = -1, height = 36 }) then
         fix_subproject_markers(st.head_s, st.tail_s)
         save_state()
       end
@@ -269,14 +269,14 @@ local function loop()
 
     -- Action 2 & 3: Packaging
     if not in_sub then
-      ImGui.Text(ctx, "打包进子工程 (Pack to Subproject):")
-      if fl.button(ctx, "📦 将选中轨道打包为子工程", { width = -1, height = 32 }) then
+      ImGui.Text(ctx, "Pack to Subproject")
+      if fl.button(ctx, "Pack selected tracks", { width = -1, height = 32 }) then
         pack_selected_tracks_to_subproject()
         save_state()
       end
 
       ImGui.Spacing(ctx)
-      if fl.button(ctx, "📦 将选中 Items 所在轨道打包为子工程", { width = -1, height = 32 }) then
+      if fl.button(ctx, "Pack selected items' tracks", { width = -1, height = 32 }) then
         pack_selected_items_to_subproject()
         save_state()
       end

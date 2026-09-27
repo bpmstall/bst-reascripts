@@ -100,11 +100,11 @@ local CNT_TYPES = { "Random Container (随机容器)", "Blend Container (混合�
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 520, 480, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Wwise Pipeline (Wwise 自动化导入工作台)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Wwise Pipeline', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "intro_card", 75) then
-      ImGui.Text(ctx, "REAPER ⇄ Audiokinetic Wwise 直通流水线")
+      ImGui.Text(ctx, "Audiokinetic Wwise Pipeline")
       ImGui.TextDisabled(ctx, "选定工程音效，一键生成 Wwise 层级结构、容器与 Play Event。")
       fl.end_card(ctx)
     end
@@ -114,13 +114,13 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Hierarchy Paths
-    ImGui.Text(ctx, "Wwise 目标父层级 (Actor-Mixer Path):")
+    ImGui.Text(ctx, "Actor-Mixer Path:")
     ImGui.SetNextItemWidth(ctx, -1)
     local tp_c, new_tp = ImGui.InputText(ctx, "##w_path", st.target_path)
     if tp_c then st.target_path = new_tp end
 
     ImGui.Spacing(ctx)
-    ImGui.Text(ctx, "容器包装类型 (Container Type):")
+    ImGui.Text(ctx, "Container Type:")
     ImGui.SetNextItemWidth(ctx, -1)
     if ImGui.BeginCombo(ctx, "##cnt_combo", CNT_TYPES[st.container_type]) then
       for idx, name in ipairs(CNT_TYPES) do
@@ -133,7 +133,7 @@ local function loop()
     end
 
     ImGui.Spacing(ctx)
-    local ev_c, new_ev = ImGui.Checkbox(ctx, "自动生成对应 Play Event 并挂载 (Generate Event)", st.create_event)
+    local ev_c, new_ev = ImGui.Checkbox(ctx, "Generate Play Event", st.create_event)
     if ev_c then st.create_event = new_ev end
 
     if st.create_event then
@@ -147,7 +147,7 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Actions
-    if fl.button(ctx, "⚡ 生成 Wwise 导入清单与容器结构 (Export TSV)", { accent = true, width = -1, height = 38 }) then
+    if fl.button(ctx, "Export Wwise import list", { accent = true, width = -1, height = 38 }) then
       export_wwise_import_file()
       save_state()
     end

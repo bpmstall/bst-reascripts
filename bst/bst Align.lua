@@ -148,11 +148,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 460, 430, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Align (音效对齐与等间距排版)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Align', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
-      ImGui.Text(ctx, "音效设计排版与瞬态对齐工作台")
+      ImGui.Text(ctx, "Align & Distribute Workbench")
       ImGui.TextDisabled(ctx, "等间距水平分布、多轨瞬态垂直精准吸附、左端/光标对齐。")
         fl.end_card(ctx)
       end
@@ -162,13 +162,13 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Distribution
-    ImGui.Text(ctx, "水平等间距分布 (Distribute Horizontally):")
+    ImGui.Text(ctx, "Horizontal Distribution")
     ImGui.SetNextItemWidth(ctx, 130)
-    local g_c, new_g = ImGui.SliderDouble(ctx, "间隔时长 (Gap s)", st.gap_s, 0.0, 2.0, "%.2fs")
+    local g_c, new_g = ImGui.SliderDouble(ctx, "Gap (s)", st.gap_s, 0.0, 2.0, "%.2fs")
     if g_c then st.gap_s = new_g end
 
     ImGui.SameLine(ctx)
-    if fl.button(ctx, "↔️ 水平等间距排布", { accent = true, width = -1, height = 30 }) then
+    if fl.button(ctx, "Distribute horizontally", { accent = true, width = -1, height = 30 }) then
         distribute_items_horizontally()
         save_state()
       end
@@ -178,14 +178,14 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Transient alignment
-    ImGui.Text(ctx, "瞬态与起音垂直对齐 (Vertical Transient Alignment):")
-    if fl.button(ctx, "🎯 以第 1 个条目为准，其余条目瞬态垂直对齐", { width = -1, height = 34 }) then
+    ImGui.Text(ctx, "Transient Alignment")
+    if fl.button(ctx, "Align transients vertically", { width = -1, height = 34 }) then
       align_by_transient_peaks()
     end
 
     ImGui.Spacing(ctx)
-    ImGui.Text(ctx, "基准线对齐 (Baseline Alignment):")
-    if fl.button(ctx, "⬅️ 全部左对齐 (对齐到光标或首条目起点)", { width = -1, height = 30 }) then
+    ImGui.Text(ctx, "Baseline Alignment")
+    if fl.button(ctx, "Align left", { width = -1, height = 30 }) then
       align_to_start()
     end
 

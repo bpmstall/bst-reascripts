@@ -168,11 +168,11 @@ local PAN_NAMES = { "左 → 右 (Left to Right)", "右 → 左 (Right to Left)"
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 480, 490, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Whoosh (动作挥砍与破空音效设计)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Whoosh', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
-      ImGui.Text(ctx, "游戏动作挥砍 / 破空风声生成器")
+      ImGui.Text(ctx, "Action & Weapon Whoosh Generator")
       ImGui.TextDisabled(ctx, "针对选中素材自动生成音高俯冲抬升包络、能量汇聚曲线与声像横扫。")
         fl.end_card(ctx)
       end
@@ -182,27 +182,27 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Parameters
-    ImGui.Text(ctx, "挥动动态曲线参数:")
+    ImGui.Text(ctx, "Dynamics & Envelope")
     ImGui.SetNextItemWidth(ctx, 130)
-    local d_c, new_d = ImGui.SliderDouble(ctx, "挥动时长 (Duration s)", st.dur_s, 0.15, 2.5, "%.2fs")
+    local d_c, new_d = ImGui.SliderDouble(ctx, "Duration (s)", st.dur_s, 0.15, 2.5, "%.2fs")
     if d_c then st.dur_s = new_d end
 
     ImGui.SameLine(ctx)
     ImGui.SetNextItemWidth(ctx, 130)
-    local a_c, new_a = ImGui.SliderDouble(ctx, "能量峰值点 (Apex %)", st.apex_pct, 15.0, 85.0, "%.0f%%")
+    local a_c, new_a = ImGui.SliderDouble(ctx, "Apex (%)", st.apex_pct, 15.0, 85.0, "%.0f%%")
     if a_c then st.apex_pct = new_a end
 
     ImGui.SetNextItemWidth(ctx, 130)
-    local p_c, new_p = ImGui.SliderDouble(ctx, "音高拉扯 (Pitch Bend ±st)", st.pitch_st, 0.0, 36.0, "%.1f st")
+    local p_c, new_p = ImGui.SliderDouble(ctx, "Pitch bend (st)", st.pitch_st, 0.0, 36.0, "%.1f st")
     if p_c then st.pitch_st = new_p end
 
     ImGui.SameLine(ctx)
     ImGui.SetNextItemWidth(ctx, 130)
-    local v_c, new_v = ImGui.SliderInt(ctx, "变奏数量 (Variations)", st.var_count, 1, 8)
+    local v_c, new_v = ImGui.SliderInt(ctx, "Variations", st.var_count, 1, 8)
     if v_c then st.var_count = new_v end
 
     ImGui.Spacing(ctx)
-    ImGui.Text(ctx, "声像扫掠方向 (Pan Sweep):")
+    ImGui.Text(ctx, "Pan sweep:")
     ImGui.SetNextItemWidth(ctx, 220)
     if ImGui.BeginCombo(ctx, "##pan_combo", PAN_NAMES[st.pan_dir]) then
       for idx, name in ipairs(PAN_NAMES) do

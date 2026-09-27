@@ -1,7 +1,13 @@
 # bst: Elastic Warp — 弹性音频瞬态对齐
 
-> **对标**: `Sexan Warp` / `Pro Tools Elastic Audio`
+> **对标**: `Sexan Warp` / `Pro Tools Elastic Audio`  
 > **定位**: 瞬态点自动打 Stretch Markers，支持拖动手柄自由贴合格点或视频打击点
+
+---
+
+## 面板预览
+
+![bst Elastic Warp](../img/elastic_warp.png)
 
 ---
 
@@ -11,8 +17,14 @@
 
 ---
 
-## 2. 功能详解
+## 2. 参数与控件说明
 
-- **瞬态灵敏度 (Sensitivity %)**: 调节瞬态检测敏感度。
-- **吸附网格**: 支持标记点自动吸附到时间线节拍网格。
-- **一键清除**: 探索完毕可一键移除所有拉伸标记还原原始采样。
+- **Sensitivity (%)**: 瞬态检测敏感度调节。
+- **Snap markers to grid**: 标记点自动吸附到时间线节拍网格。
+
+---
+
+## 3. 操作按钮
+
+- **Add stretch markers at transients**: 一键在瞬态点添加 Stretch Markers 手柄。
+- **Clear all stretch markers**: 一键移除选中条目的所有拉伸标记还原原始采样。

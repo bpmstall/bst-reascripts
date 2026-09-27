@@ -96,11 +96,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 460, 390, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Elastic Warp (弹性音频瞬态对齐)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Elastic Warp', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "intro_card", 75) then
-      ImGui.Text(ctx, "弹性拉伸 (Elastic Audio) 瞬态贴合")
+      ImGui.Text(ctx, "Elastic Audio Transient Warp")
       ImGui.TextDisabled(ctx, "自动在瞬态点打上 Stretch Markers，拖动手柄无损将击打点贴合到视频关键帧。")
       fl.end_card(ctx)
     end
@@ -109,25 +109,25 @@ local function loop()
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    ImGui.Text(ctx, "弹性吸附参数:")
+    ImGui.Text(ctx, "Parameters")
     ImGui.SetNextItemWidth(ctx, 130)
-    local sn_c, new_sn = ImGui.SliderDouble(ctx, "瞬态灵敏度 (Sensitivity %)", st.sens_pct, 10.0, 100.0, "%.0f%%")
+    local sn_c, new_sn = ImGui.SliderDouble(ctx, "Sensitivity (%)", st.sens_pct, 10.0, 100.0, "%.0f%%")
     if sn_c then st.sens_pct = new_sn end
 
-    local g_c, new_g = ImGui.Checkbox(ctx, "标记自动吸附工程网格节奏 (Snap to Grid)", st.snap_grid)
+    local g_c, new_g = ImGui.Checkbox(ctx, "Snap markers to grid", st.snap_grid)
     if g_c then st.snap_grid = new_g end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button(ctx, "🎯 一键在瞬态点添加 Stretch Markers", { accent = true, width = -1, height = 38 }) then
+    if fl.button(ctx, "Add stretch markers at transients", { accent = true, width = -1, height = 38 }) then
       add_transient_stretch_markers()
       save_state()
     end
 
     ImGui.Spacing(ctx)
-    if fl.button(ctx, "🗑️ 清除所有弹性拉伸标记 (Clear All Markers)", { width = -1, height = 30 }) then
+    if fl.button(ctx, "Clear all stretch markers", { width = -1, height = 30 }) then
       clear_stretch_markers()
     end
 

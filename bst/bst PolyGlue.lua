@@ -96,11 +96,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 460, 410, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst PolyGlue (跨轨多层智能胶合工作台)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst PolyGlue', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "intro_card", 75) then
-      ImGui.Text(ctx, "跨轨道音效分层快速合并胶合")
+      ImGui.Text(ctx, "Multi-Layer Smart Glue")
       ImGui.TextDisabled(ctx, "自动捕获多层素材的最早起点与尾音，胶合为一个统一音效块。")
       fl.end_card(ctx)
     end
@@ -110,19 +110,19 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Options
-    ImGui.Text(ctx, "胶合与尾音参数:")
+    ImGui.Text(ctx, "Parameters")
     ImGui.SetNextItemWidth(ctx, 130)
-    local t_c, new_t = ImGui.SliderDouble(ctx, "尾音保留 (Tail s)", st.tail_s, 0.0, 2.0, "%.2fs")
+    local t_c, new_t = ImGui.SliderDouble(ctx, "Tail (s)", st.tail_s, 0.0, 2.0, "%.2fs")
     if t_c then st.tail_s = new_t end
 
-    local m_c, new_m = ImGui.Checkbox(ctx, "胶合后静音源分层素材 (Mute Source Items)", st.mute_source)
+    local m_c, new_m = ImGui.Checkbox(ctx, "Mute source items", st.mute_source)
     if m_c then st.mute_source = new_m end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button(ctx, "🧩 一键智能胶合 (PolyGlue Selection)", { accent = true, width = -1, height = 38 }) then
+    if fl.button(ctx, "PolyGlue selection", { accent = true, width = -1, height = 38 }) then
       smart_glue_selection()
       save_state()
     end

@@ -132,11 +132,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 460, 490, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Propagate (nvk_PROPAGATE 式属性同步)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Propagate', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
-      ImGui.Text(ctx, "音效变奏属性一键传播同步")
+      ImGui.Text(ctx, "Propagate Properties")
       ImGui.TextDisabled(ctx, "按选中顺序：第 1 个为母版，后续选中的 Items 继承指定属性。")
         fl.end_card(ctx)
       end
@@ -145,31 +145,31 @@ local function loop()
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    ImGui.Text(ctx, "选择要传播同步的属性项:")
+    ImGui.Text(ctx, "Properties to propagate (1st item = Master):")
 
-    local sf_c, new_sf = ImGui.Checkbox(ctx, "淡入淡出时长与曲线形状 (Fades & Curves)", st.sync_fades)
+    local sf_c, new_sf = ImGui.Checkbox(ctx, "Fades & curves", st.sync_fades)
     if sf_c then st.sync_fades = new_sf end
 
-    local sv_c, new_sv = ImGui.Checkbox(ctx, "条目与 Take 音量增益 (Volume dB)", st.sync_vol)
+    local sv_c, new_sv = ImGui.Checkbox(ctx, "Volume (Item & Take)", st.sync_vol)
     if sv_c then st.sync_vol = new_sv end
 
-    local sp_c, new_sp = ImGui.Checkbox(ctx, "声像分布 (Pan)", st.sync_pan)
+    local sp_c, new_sp = ImGui.Checkbox(ctx, "Pan", st.sync_pan)
     if sp_c then st.sync_pan = new_sp end
 
-    local spi_c, new_spi = ImGui.Checkbox(ctx, "音高与保持算法 (Pitch & Preserve)", st.sync_pitch)
+    local spi_c, new_spi = ImGui.Checkbox(ctx, "Pitch & preserve algorithm", st.sync_pitch)
     if spi_c then st.sync_pitch = new_spi end
 
-    local sl_c, new_sl = ImGui.Checkbox(ctx, "裁剪音效长度 (Item Length)", st.sync_len)
+    local sl_c, new_sl = ImGui.Checkbox(ctx, "Length", st.sync_len)
     if sl_c then st.sync_len = new_sl end
 
-    local sc_c, new_sc = ImGui.Checkbox(ctx, "自定义色彩标记 (Item Color)", st.sync_color)
+    local sc_c, new_sc = ImGui.Checkbox(ctx, "Color", st.sync_color)
     if sc_c then st.sync_color = new_sc end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button(ctx, "🚀 立即传播同步到其余选中 Item", { accent = true, width = -1, height = 36 }) then
+    if fl.button(ctx, "Propagate to targets", { accent = true, width = -1, height = 36 }) then
         propagate_properties()
         save_state()
       end

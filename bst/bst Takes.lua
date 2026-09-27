@@ -170,11 +170,11 @@ fl.attach_fonts(ctx)
 local function loop()
   local nc, nv = fl.push_theme(ctx)
   ImGui.SetNextWindowSize(ctx, 480, 410, ImGui.Cond_FirstUseEver)
-  local visible, p_open = ImGui.Begin(ctx, 'bst Takes (nvk_TAKES 式多变奏管理)', true)
+  local visible, p_open = ImGui.Begin(ctx, 'bst Takes', true)
 
   if visible then
     if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
-      ImGui.Text(ctx, "多 Take 变奏工作流")
+      ImGui.Text(ctx, "Take Variations")
       ImGui.TextDisabled(ctx, "游戏脚步/枪击/受击音效变奏管理，一键瞬态重合与快速试听。")
         fl.end_card(ctx)
       end
@@ -184,8 +184,8 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Transient alignment
-    ImGui.Text(ctx, "瞬态吸附 (Transient Alignment):")
-    if fl.button(ctx, "🎯 一键对齐所有 Take 起音瞬态 (RMS Peak)", { accent = true, width = -1, height = 34 }) then
+    ImGui.Text(ctx, "Transient Alignment")
+    if fl.button(ctx, "Align take transients", { accent = true, width = -1, height = 34 }) then
         align_all_takes_transients()
       end
 
@@ -194,17 +194,17 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Randomization
-    ImGui.Text(ctx, "多 Take 变奏微调 (Take Shaping):")
+    ImGui.Text(ctx, "Take Shaping")
     ImGui.SetNextItemWidth(ctx, 120)
-    local pst_c, new_pst = ImGui.DragDouble(ctx, "音高随机 (±st)", st.pitch_st, 0.1, 0, 12, "%.1f")
+    local pst_c, new_pst = ImGui.DragDouble(ctx, "Pitch (±st)", st.pitch_st, 0.1, 0, 12, "%.1f")
     if pst_c then st.pitch_st = new_pst end
 
     ImGui.SameLine(ctx)
     ImGui.SetNextItemWidth(ctx, 120)
-    local vdb_c, new_vdb = ImGui.DragDouble(ctx, "音量随机 (±dB)", st.vol_db, 0.1, 0, 6, "%.1f")
+    local vdb_c, new_vdb = ImGui.DragDouble(ctx, "Volume (±dB)", st.vol_db, 0.1, 0, 6, "%.1f")
     if vdb_c then st.vol_db = new_vdb end
 
-    if fl.button(ctx, "🎲 为选中 Item 的所有 Take 施加随机变奏", { width = -1, height = 30 }) then
+    if fl.button(ctx, "Randomize takes", { width = -1, height = 30 }) then
       randomize_takes()
       save_state()
     end
@@ -214,13 +214,13 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Implode / Explode
-    ImGui.Text(ctx, "结构转换 (Implode / Explode):")
-    if fl.button(ctx, "📥 将选中的多个 Items 合并为一个 Item 的多 Takes", { width = -1, height = 28 }) then
+    ImGui.Text(ctx, "Conversion")
+    if fl.button(ctx, "Implode items to takes", { width = -1, height = 28 }) then
       implode_to_takes()
     end
 
     ImGui.Spacing(ctx)
-    if fl.button(ctx, "📤 将选中的 Takes 展开拆分到独立平行轨道", { width = -1, height = 28 }) then
+    if fl.button(ctx, "Explode takes to tracks", { width = -1, height = 28 }) then
       explode_takes_to_tracks()
     end
 
