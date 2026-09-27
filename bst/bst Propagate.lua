@@ -131,14 +131,15 @@ fl.attach_fonts(ctx)
 
 local function loop()
   local nc, nv = fl.push_theme(ctx)
-  ImGui.SetNextWindowSize(ctx, 450, 380, ImGui.Cond_FirstUseEver)
+  ImGui.SetNextWindowSize(ctx, 460, 490, ImGui.Cond_FirstUseEver)
   local visible, p_open = ImGui.Begin(ctx, 'bst Propagate (nvk_PROPAGATE 式属性同步)', true)
 
   if visible then
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       ImGui.Text(ctx, "音效变奏属性一键传播同步")
       ImGui.TextDisabled(ctx, "按选中顺序：第 1 个为母版，后续选中的 Items 继承指定属性。")
-    end) end
+        fl.end_card(ctx)
+      end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -168,17 +169,10 @@ local function loop()
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button_accent then
-      if fl.button_accent(ctx, "🚀 立即传播同步到其余选中 Item", -1, 36) then
+    if fl.button(ctx, "🚀 立即传播同步到其余选中 Item", { accent = true, width = -1, height = 36 }) then
         propagate_properties()
         save_state()
       end
-    else
-      if ImGui.Button(ctx, "立即传播同步到其余选中 Item", -1, 36) then
-        propagate_properties()
-        save_state()
-      end
-    end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)

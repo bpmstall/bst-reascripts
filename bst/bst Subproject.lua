@@ -219,14 +219,14 @@ fl.attach_fonts(ctx)
 
 local function loop()
   local nc, nv = fl.push_theme(ctx)
-  ImGui.SetNextWindowSize(ctx, 480, 420, ImGui.Cond_FirstUseEver)
+  ImGui.SetNextWindowSize(ctx, 480, 490, ImGui.Cond_FirstUseEver)
   local visible, p_open = ImGui.Begin(ctx, 'bst Subproject (nvk_SUBPROJECT 式工作流)', true)
 
   if visible then
     local in_sub = is_current_subproject()
 
     -- Status card
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       if in_sub then
         ImGui.TextColored(ctx, 0x6CCB5FFF, "当前正处于子工程 (Subproject) 标签页内")
         ImGui.TextDisabled(ctx, "可直接点下方按钮一键对齐渲染标记并更新代理音频。")
@@ -234,7 +234,8 @@ local function loop()
         ImGui.Text(ctx, "当前处于主工程 (Main Project)")
         ImGui.TextDisabled(ctx, "选中要分层的 Items 或轨道，一键收纳进子工程。")
       end
-    end) end
+        fl.end_card(ctx)
+      end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -259,30 +260,23 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Action 1: Marker alignment (Core nvk_SUBPROJECT feature)
-    if fl.button_accent then
-      if fl.button_accent(ctx, "🎯 一键校准 =START / =END 标记 (根据未静音 Item)", -1, 36) then
+    if fl.button(ctx, "🎯 一键校准 =START / =END 标记 (根据未静音 Item)", { accent = true, width = -1, height = 36 }) then
         fix_subproject_markers(st.head_s, st.tail_s)
         save_state()
       end
-    else
-      if ImGui.Button(ctx, "一键校准 =START / =END 标记", -1, 36) then
-        fix_subproject_markers(st.head_s, st.tail_s)
-        save_state()
-      end
-    end
 
     ImGui.Spacing(ctx)
 
     -- Action 2 & 3: Packaging
     if not in_sub then
       ImGui.Text(ctx, "打包进子工程 (Pack to Subproject):")
-      if ImGui.Button(ctx, "📦 将选中轨道打包为子工程", -1, 32) then
+      if fl.button(ctx, "📦 将选中轨道打包为子工程", { width = -1, height = 32 }) then
         pack_selected_tracks_to_subproject()
         save_state()
       end
 
       ImGui.Spacing(ctx)
-      if ImGui.Button(ctx, "📦 将选中 Items 所在轨道打包为子工程", -1, 32) then
+      if fl.button(ctx, "📦 将选中 Items 所在轨道打包为子工程", { width = -1, height = 32 }) then
         pack_selected_items_to_subproject()
         save_state()
       end

@@ -14,6 +14,11 @@
 | **bst Whoosh** | 动作音效必备 | 挥砍破空音效设计: 自动音高俯冲抬升包络 + 能量汇聚曲线 + 声像穿透 | [查看文档](Docs/bst_Whoosh.md) |
 | **bst Align** | 排版对齐必备 | 音效对齐与排版工作台: 水平等间距分布 + 跨轨瞬态垂直精准吸附对齐 | [查看文档](Docs/bst_Align.md) |
 | **bst UCS Renamer** | 工业交付标准 | 遵循全球 UCS 8.2 标准规范的游戏音效快速分类与批量自增重命名 | [查看文档](Docs/bst_UCS_Renamer.md) |
+| **bst GrimSync** | `LKC GrimSync` | 游戏音频增量镜像同步: REAPER 渲染目录与 Wwise/游戏工程双向比对与一键交付 | [查看文档](Docs/bst_GrimSync.md) |
+| **bst Wwise Pipeline**| `WAAPI Pipeline` | Wwise WAAPI 自动化导入: 选中音频直达 Wwise 层级 + 自动建容器 + 生成 Event | [查看文档](Docs/bst_Wwise_Pipeline.md) |
+| **bst PolyGlue** | `LKC PolyGlue` | 跨轨多层智能胶合: 自动捕获起落边界并合并为复合条目 (无需反复建轨) | [查看文档](Docs/bst_PolyGlue.md) |
+| **bst Slicer** | `X-Raym Split` | 瞬态智能批量切片: 录音长采样无破音切割 + 去静音 + 自动设吸附点与微淡化 | [查看文档](Docs/bst_Slicer.md) |
+| **bst Elastic Warp** | `Sexan Warp` | 弹性音频瞬态对齐: 瞬态自动打 Stretch Markers 手柄 + 贴合视频与节奏点 | [查看文档](Docs/bst_Elastic_Warp.md) |
 | **bst Auto Doppler** | `nvk_AUTODOPPLER` | 分析 Item RMS 峰值时刻，自动吸附并为配套 JSFX / 第三方多普勒写路径自动化 | [查看文档](Docs/bst_Auto_Doppler.md) |
 | **bst Loopmaker** | `nvk_LOOPMAKER` | 零交叉对齐 + 头尾交叉淡化, 批量产出无缝循环音频并自动开启循环源 | [查看文档](Docs/bst_Loopmaker.md) |
 | **bst Variations** | `nvk_VARIATIONS` | 瞬时批量音效变奏工作台 (音高/音量/声像/内容窗口平移) 与 4 档免 GUI 动作 | [查看文档](Docs/bst_Variations.md) |

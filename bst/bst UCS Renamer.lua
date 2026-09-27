@@ -105,14 +105,15 @@ fl.attach_fonts(ctx)
 
 local function loop()
   local nc, nv = fl.push_theme(ctx)
-  ImGui.SetNextWindowSize(ctx, 480, 420, ImGui.Cond_FirstUseEver)
+  ImGui.SetNextWindowSize(ctx, 480, 490, ImGui.Cond_FirstUseEver)
   local visible, p_open = ImGui.Begin(ctx, 'bst UCS Renamer (工业级音效分类命名)', true)
 
   if visible then
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       ImGui.Text(ctx, "Universal Category System (UCS 8.2) 行业标准命名")
       ImGui.TextDisabled(ctx, "按全球游戏与影视音效规范自动组装 CatID_Description_Index 命名。")
-    end) end
+        fl.end_card(ctx)
+      end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -161,17 +162,10 @@ local function loop()
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button_accent then
-      if fl.button_accent(ctx, "🏷️ 批量应用 UCS 标准重命名 (Apply Rename)", -1, 38) then
+    if fl.button(ctx, "🏷️ 批量应用 UCS 标准重命名 (Apply Rename)", { accent = true, width = -1, height = 38 }) then
         apply_ucs_rename()
         save_state()
       end
-    else
-      if ImGui.Button(ctx, "批量应用 UCS 标准重命名", -1, 38) then
-        apply_ucs_rename()
-        save_state()
-      end
-    end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)

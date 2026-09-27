@@ -97,7 +97,7 @@ local status_msg = "就绪"
 local show_settings = false
 
 local function get_file_ext(p)
-  return p:match("(%.[^%.\/]+)$") and p:match("(%.[^%.\/]+)$"):lower() or ""
+  return p:match("(%.[^.]+)$") and p:match("(%.[^.]+)$"):lower() or ""
 end
 
 local function scan_folder_recursive(path, bucket, max_depth)
@@ -109,7 +109,7 @@ local function scan_folder_recursive(path, bucket, max_depth)
     if not fn then break end
     local ext = get_file_ext(fn)
     if AUDIO_EXTS[ext] then
-      local sep = (path:sub(-1) == "/" or path:sub(-1) == "\\") and "" or "\\"
+      local sep = (path:sub(-1) == "/" or path:sub(-1) == "/") and "" or "/"
       local full = path .. sep .. fn
       bucket[#bucket + 1] = { path = full, name = fn:lower(), display = fn }
     end
@@ -120,7 +120,7 @@ local function scan_folder_recursive(path, bucket, max_depth)
     local sub = r.EnumerateSubdirectories(path, j)
     if not sub then break end
     if sub ~= "." and sub ~= ".." and sub ~= ".git" then
-      local sep = (path:sub(-1) == "/" or path:sub(-1) == "\\") and "" or "\\"
+      local sep = (path:sub(-1) == "/" or path:sub(-1) == "/") and "" or "/"
       scan_folder_recursive(path .. sep .. sub, bucket, max_depth - 1)
     end
     j = j + 1
@@ -403,20 +403,22 @@ local function loop()
 
     -- Settings panel drawer
     if show_settings then
-      if fl.card then fl.card(ctx, function()
+      if fl.begin_card and fl.begin_card(ctx, "settings_card", 130) then
         ImGui.Text(ctx, "音效素材库目录 (支持多路径，分号或换行分隔):")
-        local d_changed, new_d = ImGui.InputTextMultiline(ctx, "##dirs", st.lib_dirs, -1, 55)
+        local d_changed, new_d = ImGui.InputTextMultiline(ctx, "##dirs", st.lib_dirs, -1, 50)
         if d_changed then st.lib_dirs = new_d end
 
         local p_changed, new_p = ImGui.Checkbox(ctx, "同时包含当前工程媒体目录", st.use_proj)
         if p_changed then st.use_proj = new_p end
 
         ImGui.SameLine(ctx)
-        if ImGui.Button(ctx, "立即扫描素材库") then
+        if fl.button(ctx, "立即扫描素材库") then
           refresh_library()
         end
+        ImGui.SameLine(ctx)
         ImGui.TextDisabled(ctx, scan_msg)
-      end) end
+        fl.end_card(ctx)
+      end
     end
 
     ImGui.Spacing(ctx)
@@ -445,7 +447,7 @@ local function loop()
 
     -- Layers Card
     ImGui.Text(ctx, "分层配置 (Layers):")
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "layers_card", 160) then
       for i, l in ipairs(layers) do
         ImGui.PushID(ctx, i)
         local en_c, new_en = ImGui.Checkbox(ctx, "##en", l.enabled)
@@ -475,27 +477,21 @@ local function loop()
 
         ImGui.PopID(ctx)
       end
-    end) end
+      fl.end_card(ctx)
+    end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
     -- Action Buttons
-    if fl.button_accent then
-      if fl.button_accent(ctx, string.format("✨ 一键生成 %d 组变奏 (Generate)", st.var_count), -1, 36) then
-        generate_variations()
-        save_state()
-      end
-    else
-      if ImGui.Button(ctx, string.format("一键生成 %d 组变奏", st.var_count), -1, 36) then
-        generate_variations()
-        save_state()
-      end
+    if fl.button(ctx, string.format("✨ 一键生成 %d 组变奏 (Generate)", st.var_count), { accent = true, height = 36 }) then
+      generate_variations()
+      save_state()
     end
 
     ImGui.Spacing(ctx)
-    if ImGui.Button(ctx, "🎲 选中项就地换选 (Re-roll Selected)", -1, 28) then
+    if fl.button(ctx, "🎲 选中项就地换选 (Re-roll Selected)", { width = -1, height = 28 }) then
       reroll_selected()
     end
 
@@ -516,8 +512,4 @@ local function loop()
   end
 end
 
--- Initial library scan if not yet indexed
-r.defer(function()
-  refresh_library()
-  loop()
-end)
+r.defer(loop)

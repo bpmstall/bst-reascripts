@@ -167,14 +167,15 @@ local PAN_NAMES = { "左 → 右 (Left to Right)", "右 → 左 (Right to Left)"
 
 local function loop()
   local nc, nv = fl.push_theme(ctx)
-  ImGui.SetNextWindowSize(ctx, 480, 420, ImGui.Cond_FirstUseEver)
+  ImGui.SetNextWindowSize(ctx, 480, 490, ImGui.Cond_FirstUseEver)
   local visible, p_open = ImGui.Begin(ctx, 'bst Whoosh (动作挥砍与破空音效设计)', true)
 
   if visible then
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       ImGui.Text(ctx, "游戏动作挥砍 / 破空风声生成器")
       ImGui.TextDisabled(ctx, "针对选中素材自动生成音高俯冲抬升包络、能量汇聚曲线与声像横扫。")
-    end) end
+        fl.end_card(ctx)
+      end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -217,17 +218,10 @@ local function loop()
     ImGui.Separator(ctx)
     ImGui.Spacing(ctx)
 
-    if fl.button_accent then
-      if fl.button_accent(ctx, string.format("🗡️ 生成 %d 组挥动变奏 (Generate Whooshes)", st.var_count), -1, 38) then
+    if fl.button(ctx, string.format("🗡️ 生成 %d 组挥动变奏 (Generate Whooshes)", st.var_count), { accent = true, height = 38 }) then
         generate_whooshes()
         save_state()
       end
-    else
-      if ImGui.Button(ctx, string.format("生成 %d 组挥动变奏", st.var_count), -1, 38) then
-        generate_whooshes()
-        save_state()
-      end
-    end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)

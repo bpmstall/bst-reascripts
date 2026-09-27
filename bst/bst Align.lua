@@ -147,14 +147,15 @@ fl.attach_fonts(ctx)
 
 local function loop()
   local nc, nv = fl.push_theme(ctx)
-  ImGui.SetNextWindowSize(ctx, 450, 360, ImGui.Cond_FirstUseEver)
+  ImGui.SetNextWindowSize(ctx, 460, 430, ImGui.Cond_FirstUseEver)
   local visible, p_open = ImGui.Begin(ctx, 'bst Align (音效对齐与等间距排版)', true)
 
   if visible then
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       ImGui.Text(ctx, "音效设计排版与瞬态对齐工作台")
       ImGui.TextDisabled(ctx, "等间距水平分布、多轨瞬态垂直精准吸附、左端/光标对齐。")
-    end) end
+        fl.end_card(ctx)
+      end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -167,17 +168,10 @@ local function loop()
     if g_c then st.gap_s = new_g end
 
     ImGui.SameLine(ctx)
-    if fl.button_accent then
-      if fl.button_accent(ctx, "↔️ 水平等间距排布", -1, 30) then
+    if fl.button(ctx, "↔️ 水平等间距排布", { accent = true, width = -1, height = 30 }) then
         distribute_items_horizontally()
         save_state()
       end
-    else
-      if ImGui.Button(ctx, "水平等间距排布", -1, 30) then
-        distribute_items_horizontally()
-        save_state()
-      end
-    end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -185,13 +179,13 @@ local function loop()
 
     -- Transient alignment
     ImGui.Text(ctx, "瞬态与起音垂直对齐 (Vertical Transient Alignment):")
-    if ImGui.Button(ctx, "🎯 以第 1 个条目为准，其余条目瞬态垂直对齐", -1, 34) then
+    if fl.button(ctx, "🎯 以第 1 个条目为准，其余条目瞬态垂直对齐", { width = -1, height = 34 }) then
       align_by_transient_peaks()
     end
 
     ImGui.Spacing(ctx)
     ImGui.Text(ctx, "基准线对齐 (Baseline Alignment):")
-    if ImGui.Button(ctx, "⬅️ 全部左对齐 (对齐到光标或首条目起点)", -1, 30) then
+    if fl.button(ctx, "⬅️ 全部左对齐 (对齐到光标或首条目起点)", { width = -1, height = 30 }) then
       align_to_start()
     end
 

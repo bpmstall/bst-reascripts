@@ -257,14 +257,15 @@ fl.attach_fonts(ctx)
 
 local function loop()
   local nc, nv = fl.push_theme(ctx)
-  ImGui.SetNextWindowSize(ctx, 480, 390, ImGui.Cond_FirstUseEver)
+  ImGui.SetNextWindowSize(ctx, 480, 460, ImGui.Cond_FirstUseEver)
   local visible, p_open = ImGui.Begin(ctx, 'bst Folder Items (nvk_FOLDER_ITEMS 式折叠管理)', true)
 
   if visible then
-    if fl.card then fl.card(ctx, function()
+    if fl.begin_card and fl.begin_card(ctx, "panel_card", 75) then
       ImGui.Text(ctx, "Folder Item 容器控制")
       ImGui.TextDisabled(ctx, "在父级折叠轨生成总控 Item，移动/缩放/重命名时子轨素材同步。")
-    end) end
+        fl.end_card(ctx)
+      end
 
     ImGui.Spacing(ctx)
     ImGui.Separator(ctx)
@@ -288,26 +289,19 @@ local function loop()
     ImGui.Spacing(ctx)
 
     -- Actions
-    if fl.button_accent then
-      if fl.button_accent(ctx, "📂 为折叠轨生成 Folder Items (按子轨自动识别)", -1, 36) then
+    if fl.button(ctx, "📂 为折叠轨生成 Folder Items (按子轨自动识别)", { accent = true, width = -1, height = 36 }) then
         generate_folder_items()
         save_state()
       end
-    else
-      if ImGui.Button(ctx, "为折叠轨生成 Folder Items", -1, 36) then
-        generate_folder_items()
-        save_state()
-      end
-    end
 
     ImGui.Spacing(ctx)
-    if ImGui.Button(ctx, "🏷️ 从选中的 Folder Item 级联重命名子轨素材", -1, 30) then
+    if fl.button(ctx, "🏷️ 从选中的 Folder Item 级联重命名子轨素材", { width = -1, height = 30 }) then
       cascade_names_from_folder_items()
       save_state()
     end
 
     ImGui.Spacing(ctx)
-    if ImGui.Button(ctx, "🔗 选中 Folder Item 下对应的全部子轨素材", -1, 30) then
+    if fl.button(ctx, "🔗 选中 Folder Item 下对应的全部子轨素材", { width = -1, height = 30 }) then
       select_children_of_folder_items()
     end
 
