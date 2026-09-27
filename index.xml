@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="bst Scripts">
   <category name="BST Sound Tools">
+    <reapack name="bst Create.lua" type="script" desc="多层声音设计生成器: 关键词素材库搜索 + 瞬态对齐 + 多层变奏快速生成 (nvk CREATE 式, Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Create.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Create.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Subproject.lua" type="script" desc="子工程工作流助手: 一键打包分层轨 + 智能对齐渲染标记 (=START/=END) + 代理更新 (nvk SUBPROJECT 式, Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Subproject.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Subproject.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Folder Items.lua" type="script" desc="折叠轨容器管理: 父折叠轨总控 Item + 子轨素材联动控制 + 级联命名 (nvk FOLDER_ITEMS 式, Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Folder Items.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Folder%20Items.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Takes.lua" type="script" desc="多 Take 变奏工作流: 多 Take 瞬态/起音 RMS 对齐 + 合并/拆分 + 批量变奏微调 (nvk TAKES 式, Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Takes.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Takes.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Propagate.lua" type="script" desc="变奏属性传播同步: 淡变曲线/音量/声像/音高一键从母版同步到目标 Item (nvk PROPAGATE 式, Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Propagate.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Propagate.lua</source>
+      </version>
+    </reapack>
     <reapack name="bst Auto Doppler.lua" type="script" desc="自动多普勒: 按 item RMS 峰值自动写路径自动化 (nvk AUTODOPPLER 式, 需配套 bst_Doppler.jsfx)">
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Auto Doppler.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Auto%20Doppler.lua</source>
