@@ -11,6 +11,9 @@
 | **bst Folder Items** | `nvk_FOLDER_ITEMS` | 父折叠轨总控容器条目 + 子轨素材联动控制 + 级联智能重命名 | [查看文档](Docs/bst_Folder_Items.md) |
 | **bst Takes** | `nvk_TAKES` | 多 Take 瞬态起音精准吸附重合 + Implode/Explode 转换 + 批量变奏微调 | [查看文档](Docs/bst_Takes.md) |
 | **bst Propagate** | `nvk_PROPAGATE` | 变奏属性一键广播同步: 淡变曲线/音量/声像/音高/长度从母版同步到目标 | [查看文档](Docs/bst_Propagate.md) |
+| **bst Whoosh** | 动作音效必备 | 挥砍破空音效设计: 自动音高俯冲抬升包络 + 能量汇聚曲线 + 声像穿透 | [查看文档](Docs/bst_Whoosh.md) |
+| **bst Align** | 排版对齐必备 | 音效对齐与排版工作台: 水平等间距分布 + 跨轨瞬态垂直精准吸附对齐 | [查看文档](Docs/bst_Align.md) |
+| **bst UCS Renamer** | 工业交付标准 | 遵循全球 UCS 8.2 标准规范的游戏音效快速分类与批量自增重命名 | [查看文档](Docs/bst_UCS_Renamer.md) |
 | **bst Auto Doppler** | `nvk_AUTODOPPLER` | 分析 Item RMS 峰值时刻，自动吸附并为配套 JSFX / 第三方多普勒写路径自动化 | [查看文档](Docs/bst_Auto_Doppler.md) |
 | **bst Loopmaker** | `nvk_LOOPMAKER` | 零交叉对齐 + 头尾交叉淡化, 批量产出无缝循环音频并自动开启循环源 | [查看文档](Docs/bst_Loopmaker.md) |
 | **bst Variations** | `nvk_VARIATIONS` | 瞬时批量音效变奏工作台 (音高/音量/声像/内容窗口平移) 与 4 档免 GUI 动作 | [查看文档](Docs/bst_Variations.md) |

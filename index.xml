@@ -26,6 +26,21 @@
         <source main="main" file="bst/bst Propagate.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Propagate.lua</source>
       </version>
     </reapack>
+    <reapack name="bst Whoosh.lua" type="script" desc="动作挥砍与破空音效设计: 自动音高俯冲抬升包络 + 能量汇聚曲线 + 声像穿透 (Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Whoosh.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Whoosh.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst Align.lua" type="script" desc="音效对齐与排版工作台: 水平等间距分布 + 跨轨瞬态垂直精准吸附对齐 (Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst Align.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Align.lua</source>
+      </version>
+    </reapack>
+    <reapack name="bst UCS Renamer.lua" type="script" desc="工业级音效分类命名: 全球 Universal Category System (UCS 8.2) 规范重命名 (Fluent 面板)">
+      <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
+        <source main="main" file="bst/bst UCS Renamer.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20UCS%20Renamer.lua</source>
+      </version>
+    </reapack>
     <reapack name="bst Auto Doppler.lua" type="script" desc="自动多普勒: 按 item RMS 峰值自动写路径自动化 (nvk AUTODOPPLER 式, 需配套 bst_Doppler.jsfx)">
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Auto Doppler.lua">https://github.com/bpmstall/bst-reascripts/raw/main/bst/bst%20Auto%20Doppler.lua</source>
