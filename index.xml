@@ -1,269 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="bst Scripts">
   <category name="BST Sound Tools">
-    <reapack name="bst_lib.lua" type="script" desc="[dependency] Shared utility library (required by all bst scripts)">
+    <reapack name="bst_lib.lua" type="script" desc="bst shared library (dependency)">
       <version name="1.3" author="bpmstall" time="2026-09-01T22:00:00Z">
         <source file="bst/bst_lib.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst_lib.lua</source>
       </version>
     </reapack>
-    <reapack name="bst_fluent.lua" type="script" desc="[dependency] Fluent 2 UI library (required by all bst GUI scripts)">
+    <reapack name="bst_fluent.lua" type="script" desc="bst Fluent 2 UI library (dependency)">
       <version name="1.1" author="bpmstall" time="2026-09-01T22:40:00Z">
         <source file="bst/bst_fluent.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst_fluent.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Create.lua" type="script" desc="Multi-layer sound design generator with library search and transient alignment">
+    <reapack name="bst Create.lua" type="script" desc="bst Create">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Create.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Create.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Subproject.lua" type="script" desc="Pack tracks into subprojects with auto =START/=END markers">
+    <reapack name="bst Subproject.lua" type="script" desc="bst Subproject">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Subproject.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Subproject.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Folder Items.lua" type="script" desc="Create container items on folder tracks with cascade rename">
+    <reapack name="bst Folder Items.lua" type="script" desc="bst Folder Items">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Folder Items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Folder%20Items.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Takes.lua" type="script" desc="Align take transients, implode/explode, batch randomize">
+    <reapack name="bst Takes.lua" type="script" desc="bst Takes">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Takes.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Takes.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Propagate.lua" type="script" desc="Propagate fades/volume/pan/pitch from master item to targets">
+    <reapack name="bst Propagate.lua" type="script" desc="bst Propagate">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Propagate.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Propagate.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Whoosh.lua" type="script" desc="Whoosh/swish designer with pitch bend, apex curve, pan sweep">
+    <reapack name="bst Whoosh.lua" type="script" desc="bst Whoosh">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Whoosh.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Whoosh.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Align.lua" type="script" desc="Distribute items horizontally or align transients vertically">
+    <reapack name="bst Align.lua" type="script" desc="bst Align">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Align.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Align.lua</source>
       </version>
     </reapack>
-    <reapack name="bst UCS Renamer.lua" type="script" desc="Batch rename items with UCS 8.2 categories and auto-increment">
+    <reapack name="bst UCS Renamer.lua" type="script" desc="bst UCS Renamer">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst UCS Renamer.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20UCS%20Renamer.lua</source>
       </version>
     </reapack>
-    <reapack name="bst GrimSync.lua" type="script" desc="Incremental sync rendered audio to game engine / Wwise directory">
+    <reapack name="bst GrimSync.lua" type="script" desc="bst GrimSync">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst GrimSync.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20GrimSync.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Wwise Pipeline.lua" type="script" desc="Generate Wwise import list, containers and Play Events from selection">
+    <reapack name="bst Wwise Pipeline.lua" type="script" desc="bst Wwise Pipeline">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Wwise Pipeline.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Wwise%20Pipeline.lua</source>
       </version>
     </reapack>
-    <reapack name="bst PolyGlue.lua" type="script" desc="Glue multi-track layers into a single composite item">
+    <reapack name="bst PolyGlue.lua" type="script" desc="bst PolyGlue">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst PolyGlue.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20PolyGlue.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Slicer.lua" type="script" desc="Dynamic split by transient threshold with auto fade and snap offset">
+    <reapack name="bst Slicer.lua" type="script" desc="bst Slicer">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Slicer.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Slicer.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Elastic Warp.lua" type="script" desc="Add stretch markers at transients for elastic audio alignment">
+    <reapack name="bst Elastic Warp.lua" type="script" desc="bst Elastic Warp">
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Elastic Warp.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Elastic%20Warp.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Auto Doppler.lua" type="script" desc="Auto-write doppler automation from item RMS peak">
+    <reapack name="bst Auto Doppler.lua" type="script" desc="bst Auto Doppler">
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Auto Doppler.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Auto%20Doppler.lua</source>
       </version>
     </reapack>
-    <reapack name="bst_Doppler.jsfx" type="effect" desc="Path-driven doppler JSFX (companion to bst Auto Doppler)">
+    <reapack name="bst_Doppler.jsfx" type="effect" desc="bst Doppler JSFX">
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source file="Effects/bst/bst_Doppler.jsfx" type="effect">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/Effects/bst/bst_Doppler.jsfx</source>
       </version>
     </reapack>
-    <reapack name="bst Loopmaker.lua" type="script" desc="Seamless loop generator with zero-crossing and crossfade">
+    <reapack name="bst Loopmaker.lua" type="script" desc="bst Loopmaker">
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Loopmaker.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Loopmaker.lua</source>
       </version>
     </reapack>
-    <reapack name="bst SD Toolbox.lua" type="script" desc="All-in-one sound design panel (variations, fades, normalize, rename, render)">
+    <reapack name="bst SD Toolbox.lua" type="script" desc="bst SD Toolbox">
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst SD Toolbox.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20SD%20Toolbox.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Search Palette.lua" type="script" desc="Quick launcher: fuzzy search tracks/items/markers/FX/scripts">
+    <reapack name="bst Search Palette.lua" type="script" desc="bst Search Palette">
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Search Palette.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Search%20Palette.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Variations Studio.lua" type="script" desc="Variation workbench with pitch/volume/pan/content randomization">
+    <reapack name="bst Variations Studio.lua" type="script" desc="bst Variations Studio">
       <version name="1.2" author="bpmstall" time="2026-09-01T22:00:00Z">
         <source main="main" file="bst/bst Variations Studio.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variations%20Studio.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Variation generator.lua" type="script" desc="Quick variation generator">
+    <reapack name="bst Variation generator.lua" type="script" desc="bst Variation Generator">
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Variation generator.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variation%20generator.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Render Blocks.lua" type="script" desc="Render block management with status tracking and tail control">
+    <reapack name="bst Render Blocks.lua" type="script" desc="bst Render Blocks">
       <version name="1.4" author="bpmstall" time="2026-09-01T23:10:00Z">
         <source main="main" file="bst/bst Render Blocks.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Render%20Blocks.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Normalize items.lua" type="script" desc="Normalize selected items to target dBFS">
+    <reapack name="bst Normalize items.lua" type="script" desc="bst Normalize Items">
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Normalize items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Normalize%20items.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Rename takes.lua" type="script" desc="Batch rename takes with safe filename characters">
+    <reapack name="bst Rename takes.lua" type="script" desc="bst Rename Takes">
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Rename takes.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Rename%20takes.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Render selected items.lua" type="script" desc="Render selected items to WAV silently">
+    <reapack name="bst Render selected items.lua" type="script" desc="bst Render Selected Items">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Render selected items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Render%20selected%20items.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Decontaminate.lua" type="script" desc="Reset selected items (volume/pan/pitch/rate) to clean state">
+    <reapack name="bst Decontaminate.lua" type="script" desc="bst Decontaminate">
       <version name="1.0" author="bpmstall" time="2026-09-01T22:00:00Z">
         <source main="main" file="bst/bst Decontaminate.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Decontaminate.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Zero-Cross Trim &amp; Loop.lua" type="script" desc="Trim to zero-crossing and set loop source">
+    <reapack name="bst Zero-Cross Trim &amp; Loop.lua" type="script" desc="bst Zero-Cross Trim &amp; Loop">
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Zero-Cross Trim &amp; Loop.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Zero-Cross%20Trim%20%26%20Loop.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Snap Offset at Peak.lua" type="script" desc="Set snap offset to RMS peak position">
+    <reapack name="bst Snap Offset at Peak.lua" type="script" desc="bst Snap Offset at Peak">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Snap Offset at Peak.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Snap%20Offset%20at%20Peak.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Take Next.lua" type="script" desc="Cycle to next take">
+    <reapack name="bst Take Next.lua" type="script" desc="bst Take Next">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Take Next.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Take%20Next.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Take Prev.lua" type="script" desc="Cycle to previous take">
+    <reapack name="bst Take Prev.lua" type="script" desc="bst Take Prev">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Take Prev.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Take%20Prev.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Take Random.lua" type="script" desc="Switch to a random take (no repeat)">
+    <reapack name="bst Take Random.lua" type="script" desc="bst Take Random">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Take Random.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Take%20Random.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Play Next Item.lua" type="script" desc="Jump to next item and play">
+    <reapack name="bst Play Next Item.lua" type="script" desc="bst Play Next Item">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Play Next Item.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Play%20Next%20Item.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Play Prev Item.lua" type="script" desc="Jump to previous item and play">
+    <reapack name="bst Play Prev Item.lua" type="script" desc="bst Play Prev Item">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Play Prev Item.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Play%20Prev%20Item.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Move Items Up.lua" type="script" desc="Move selected items to track above">
+    <reapack name="bst Move Items Up.lua" type="script" desc="bst Move Items Up">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Move Items Up.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Move%20Items%20Up.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Move Items Down.lua" type="script" desc="Move selected items to track below">
+    <reapack name="bst Move Items Down.lua" type="script" desc="bst Move Items Down">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Move Items Down.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Move%20Items%20Down.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Randomize Positions.lua" type="script" desc="Randomize item positions within time selection">
+    <reapack name="bst Randomize Positions.lua" type="script" desc="bst Randomize Positions">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Randomize Positions.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Randomize%20Positions.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Variations Light.lua" type="script" desc="Quick variation: light (1 var, +/-0.5st, +/-0.5dB)">
+    <reapack name="bst Variations Light.lua" type="script" desc="bst Variations Light">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Variations Light.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variations%20Light.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Variations Medium.lua" type="script" desc="Quick variation: medium (2 vars, +/-2st, +/-1.5dB)">
+    <reapack name="bst Variations Medium.lua" type="script" desc="bst Variations Medium">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Variations Medium.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variations%20Medium.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Variations Heavy.lua" type="script" desc="Quick variation: heavy (4 vars, +/-6st, +/-3dB)">
+    <reapack name="bst Variations Heavy.lua" type="script" desc="bst Variations Heavy">
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Variations Heavy.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variations%20Heavy.lua</source>
       </version>
     </reapack>
   </category>
   <category name="BST Clipboard">
-    <reapack name="bst Clipboard Manager.lua" type="script" desc="Visual clipboard manager with waveform preview and drag-out paste">
+    <reapack name="bst Clipboard Manager.lua" type="script" desc="bst Clipboard Manager">
       <version name="2.5" author="bpmstall" time="2026-09-02T01:10:00Z">
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Clipboard%20Manager.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Copy (Smart).lua" type="script" desc="Smart copy: context-aware copy with clipboard history">
+    <reapack name="bst Copy (Smart).lua" type="script" desc="bst Copy (Smart)">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Copy (Smart).lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Copy%20%28Smart%29.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Copy (Smart) - MIDI.lua" type="script" desc="Smart copy for MIDI editor context">
+    <reapack name="bst Copy (Smart) - MIDI.lua" type="script" desc="bst Copy (Smart) - MIDI">
       <version name="1.0" author="bpmstall" time="2026-09-02T01:10:00Z">
         <source main="midi_editor" file="CBM/bst Copy (Smart) - MIDI.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Copy%20%28Smart%29%20-%20MIDI.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Copy (Smart) - MediaExplorer.lua" type="script" desc="Smart copy for Media Explorer context">
+    <reapack name="bst Copy (Smart) - MediaExplorer.lua" type="script" desc="bst Copy (Smart) - Media Explorer">
       <version name="1.0" author="bpmstall" time="2026-09-02T01:10:00Z">
         <source main="mediaexplorer" file="CBM/bst Copy (Smart) - MediaExplorer.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Copy%20%28Smart%29%20-%20MediaExplorer.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Copy Items.lua" type="script" desc="Copy selected items with clipboard history">
+    <reapack name="bst Copy Items.lua" type="script" desc="bst Copy Items">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Copy Items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Copy%20Items.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Paste Last.lua" type="script" desc="Paste most recent clipboard entry at edit cursor">
+    <reapack name="bst Paste Last.lua" type="script" desc="bst Paste Last">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Paste Last.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Paste%20Last.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Capture Items.lua" type="script" desc="Capture selected items to clipboard history">
+    <reapack name="bst Capture Items.lua" type="script" desc="bst Capture Items">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Capture Items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Items.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Capture Tracks.lua" type="script" desc="Capture selected tracks to clipboard history">
+    <reapack name="bst Capture Tracks.lua" type="script" desc="bst Capture Tracks">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Capture Tracks.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Tracks.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Capture Markers.lua" type="script" desc="Capture all markers/regions to clipboard history">
+    <reapack name="bst Capture Markers.lua" type="script" desc="bst Capture Markers">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Capture Markers.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Markers.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Capture Envelope.lua" type="script" desc="Capture selected envelope to clipboard history">
+    <reapack name="bst Capture Envelope.lua" type="script" desc="bst Capture Envelope">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Capture Envelope.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20Envelope.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Capture MIDI.lua" type="script" desc="Capture take MIDI to clipboard history">
+    <reapack name="bst Capture MIDI.lua" type="script" desc="bst Capture MIDI">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Capture MIDI.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Capture%20MIDI.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Settings.lua" type="script" desc="Clipboard manager settings panel">
+    <reapack name="bst Settings.lua" type="script" desc="bst Clipboard Settings">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Settings.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Settings.lua</source>
       </version>
     </reapack>
-    <reapack name="bst Toggle Sidebar.lua" type="script" desc="Toggle clipboard manager sidebar">
+    <reapack name="bst Toggle Sidebar.lua" type="script" desc="bst Toggle Clipboard Sidebar">
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="CBM/bst Toggle Sidebar.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Toggle%20Sidebar.lua</source>
       </version>
