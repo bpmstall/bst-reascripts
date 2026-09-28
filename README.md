@@ -93,7 +93,6 @@ Each script has detailed documentation in the [`Docs/`](Docs/) folder with scree
 
 Report issues: [GitHub Issues](https://github.com/bpmstall/bst-reascripts/issues)
 
-REAPER Forum: [Cockos REAPER Forums](https://forum.cockos.com)
 
 ## License
 

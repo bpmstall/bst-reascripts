@@ -90,4 +90,3 @@ https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/index.xml
 
 问题反馈：[GitHub Issues](https://github.com/bpmstall/bst-reascripts/issues)
 
-REAPER 论坛：[Cockos REAPER Forums](https://forum.cockos.com)
