@@ -2,136 +2,406 @@
 <index version="1" name="bst Scripts">
   <category name="BST Sound Tools">
     <reapack name="bst_lib.lua" type="script" desc="bst shared library (dependency)">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Shared utility library required by all bst scripts. Install this first.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.3" author="bpmstall" time="2026-09-01T22:00:00Z">
         <source file="bst/bst_lib.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst_lib.lua</source>
       </version>
     </reapack>
     <reapack name="bst_fluent.lua" type="script" desc="bst Fluent 2 UI library (dependency)">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Fluent 2 design system for ReaImGui. Required by all bst GUI scripts.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.1" author="bpmstall" time="2026-09-01T22:40:00Z">
         <source file="bst/bst_fluent.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst_fluent.lua</source>
       </version>
     </reapack>
     <reapack name="bst Create.lua" type="script" desc="bst Create">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Multi-layer sound design workbench. Search your sample library by keyword, stack layers (Attack/Body/Sub/Tail) on separate tracks, auto-align transients by RMS peak, and generate multiple variations in one click.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Create.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Create.lua</source>
       </version>
     </reapack>
     <reapack name="bst Subproject.lua" type="script" desc="bst Subproject">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Pack selected tracks into a subproject (.rpp). Automatically places =START/=END markers at item boundaries and renders the proxy file.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Subproject.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Subproject.lua</source>
       </version>
     </reapack>
     <reapack name="bst Folder Items.lua" type="script" desc="bst Folder Items">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Create container items on folder tracks that span all child items. Supports cascade renaming and group linking for easy drag-and-drop of layered sounds.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Folder Items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Folder%20Items.lua</source>
       </version>
     </reapack>
     <reapack name="bst Takes.lua" type="script" desc="bst Takes">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Align transient peaks across multiple takes so switching never causes timing drift. Also provides implode (items to takes) and explode (takes to tracks) conversion.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Takes.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Takes.lua</source>
       </version>
     </reapack>
     <reapack name="bst Propagate.lua" type="script" desc="bst Propagate">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Copy fades, volume, pan, pitch, length, and color from the first selected item to all other selected items.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Propagate.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Propagate.lua</source>
       </version>
     </reapack>
     <reapack name="bst Whoosh.lua" type="script" desc="bst Whoosh">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Generate whoosh/swish variations from any source material. Writes pitch bend envelopes, apex energy curves, and pan sweeps automatically.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Whoosh.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Whoosh.lua</source>
       </version>
     </reapack>
     <reapack name="bst Align.lua" type="script" desc="bst Align">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Distribute items with equal gaps horizontally, or snap transient peaks to a vertical reference across tracks. Also supports left-align to cursor.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Align.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Align.lua</source>
       </version>
     </reapack>
     <reapack name="bst UCS Renamer.lua" type="script" desc="bst UCS Renamer">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Batch rename items using Universal Category System (UCS 8.2) standard. Built-in category picker (SWSH, IMPT, EXPL, MGIC, etc.) with auto-increment numbering.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst UCS Renamer.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20UCS%20Renamer.lua</source>
       </version>
     </reapack>
     <reapack name="bst GrimSync.lua" type="script" desc="bst GrimSync">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Compare a REAPER render directory against a game engine or Wwise target directory. Shows new/modified files and syncs incrementally with optional backup.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst GrimSync.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20GrimSync.lua</source>
       </version>
     </reapack>
     <reapack name="bst Wwise Pipeline.lua" type="script" desc="bst Wwise Pipeline">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Export a Wwise tab-delimited import list from selected items. Generates Random/Blend/Sequence Container definitions and optional Play Events.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Wwise Pipeline.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Wwise%20Pipeline.lua</source>
       </version>
     </reapack>
     <reapack name="bst PolyGlue.lua" type="script" desc="bst PolyGlue">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Glue items across multiple tracks into a single composite item. Auto-detects start/end boundaries with configurable tail padding.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst PolyGlue.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20PolyGlue.lua</source>
       </version>
     </reapack>
     <reapack name="bst Slicer.lua" type="script" desc="bst Slicer">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Split long recordings at transient peaks. Removes silent gaps, adds micro-fades to prevent clicks, and sets snap offset at each transient.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Slicer.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Slicer.lua</source>
       </version>
     </reapack>
     <reapack name="bst Elastic Warp.lua" type="script" desc="bst Elastic Warp">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Detect transients and place stretch markers inside takes. Drag the markers to time-stretch audio to video hits or beat positions without pitch change.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-15T00:00:00Z">
         <source main="main" file="bst/bst Elastic Warp.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Elastic%20Warp.lua</source>
       </version>
     </reapack>
     <reapack name="bst Auto Doppler.lua" type="script" desc="bst Auto Doppler">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Analyze item RMS peak and auto-write doppler pitch automation. Works with the included bst_Doppler.jsfx effect.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Auto Doppler.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Auto%20Doppler.lua</source>
       </version>
     </reapack>
     <reapack name="bst_Doppler.jsfx" type="effect" desc="bst Doppler JSFX">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 JSFX effect driven by parameter automation for doppler pitch shift. Companion to bst Auto Doppler.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source file="Effects/bst/bst_Doppler.jsfx" type="effect">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/Effects/bst/bst_Doppler.jsfx</source>
       </version>
     </reapack>
     <reapack name="bst Loopmaker.lua" type="script" desc="bst Loopmaker">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Create seamless audio loops. Finds zero-crossings, applies crossfades at loop boundaries, and enables loop source on the item.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Loopmaker.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Loopmaker.lua</source>
       </version>
     </reapack>
     <reapack name="bst SD Toolbox.lua" type="script" desc="bst SD Toolbox">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 All-in-one sound design panel combining variations, fades, normalize, rename, and render in a single Fluent 2 window.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst SD Toolbox.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20SD%20Toolbox.lua</source>
       </version>
     </reapack>
     <reapack name="bst Search Palette.lua" type="script" desc="bst Search Palette">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Quick command palette. Type to fuzzy-search tracks (t:), items (i:), markers (m:), FX (f:), or scripts (s:) and jump directly.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Search Palette.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Search%20Palette.lua</source>
       </version>
     </reapack>
     <reapack name="bst Variations Studio.lua" type="script" desc="bst Variations Studio">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Advanced variation workbench. Randomize pitch, volume, pan, and content offset with per-parameter probability controls.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.2" author="bpmstall" time="2026-09-01T22:00:00Z">
         <source main="main" file="bst/bst Variations Studio.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variations%20Studio.lua</source>
       </version>
     </reapack>
     <reapack name="bst Variation generator.lua" type="script" desc="bst Variation Generator">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Simple one-click variation generator for selected items.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Variation generator.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Variation%20generator.lua</source>
       </version>
     </reapack>
     <reapack name="bst Render Blocks.lua" type="script" desc="bst Render Blocks">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Manage render regions as named blocks. Tracks rendered status with color coding and supports relative tail length.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.4" author="bpmstall" time="2026-09-01T23:10:00Z">
         <source main="main" file="bst/bst Render Blocks.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Render%20Blocks.lua</source>
       </version>
     </reapack>
     <reapack name="bst Normalize items.lua" type="script" desc="bst Normalize Items">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Normalize selected items to a target dBFS peak level.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Normalize items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Normalize%20items.lua</source>
       </version>
     </reapack>
     <reapack name="bst Rename takes.lua" type="script" desc="bst Rename Takes">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Batch rename takes with safe filename character filtering.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.1" author="bpmstall" time="2026-09-01T16:07:04Z">
         <source main="main" file="bst/bst Rename takes.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Rename%20takes.lua</source>
       </version>
     </reapack>
     <reapack name="bst Render selected items.lua" type="script" desc="bst Render Selected Items">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Silently render selected items to WAV in the project directory.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-08-24T08:30:01Z">
         <source main="main" file="bst/bst Render selected items.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Render%20selected%20items.lua</source>
       </version>
     </reapack>
     <reapack name="bst Decontaminate.lua" type="script" desc="bst Decontaminate">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Reset volume, pan, pitch, and playback rate on selected items back to defaults.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-01T22:00:00Z">
         <source main="main" file="bst/bst Decontaminate.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Decontaminate.lua</source>
       </version>
@@ -142,6 +412,16 @@
       </version>
     </reapack>
     <reapack name="bst Snap Offset at Peak.lua" type="script" desc="bst Snap Offset at Peak">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Set the snap offset of selected items to their RMS peak position.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="1.0" author="bpmstall" time="2026-09-01T21:30:00Z">
         <source main="main" file="bst/bst Snap Offset at Peak.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/bst/bst%20Snap%20Offset%20at%20Peak.lua</source>
       </version>
@@ -204,6 +484,16 @@
   </category>
   <category name="BST Clipboard">
     <reapack name="bst Clipboard Manager.lua" type="script" desc="bst Clipboard Manager">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Visual clipboard with waveform preview. Capture items, tracks, markers, envelopes, MIDI, and FX chains. Drag entries out to paste. Supports multiple boards and search.\par}
+}
+]]></description>
+        <link rel="website">https://github.com/bpmstall/bst-reascripts</link>
+      </metadata>
       <version name="2.5" author="bpmstall" time="2026-09-02T01:10:00Z">
         <source main="main" file="CBM/bst Clipboard Manager.lua">https://raw.githubusercontent.com/bpmstall/bst-reascripts/main/CBM/bst%20Clipboard%20Manager.lua</source>
       </version>
