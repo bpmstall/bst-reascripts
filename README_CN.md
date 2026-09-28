@@ -1,3 +1,5 @@
+> **Chinese** | [English](README.md)
+
 # bst-reascripts
 
 面向游戏音频和声音设计的 REAPER 脚本集，Fluent 2 风格界面。

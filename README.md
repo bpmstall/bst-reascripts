@@ -1,3 +1,5 @@
+> **[中文](README_CN.md)** | English
+
 # bst-reascripts
 
 Game audio & sound design scripts for REAPER with Fluent 2 UI.
